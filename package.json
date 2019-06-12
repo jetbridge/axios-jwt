@@ -1,10 +1,14 @@
 {
   "name": "axios-jwt",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Axios interceptor to store, use, and refresh tokens for authentication.",
   "main": "index.js",
   "types": "dist/index.d.ts",
-  "repository": "https://github.com/jetbridge/axios-jwt",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jetbridge/axios-jwt"
+  },
+  "homepage": "https://github.com/jetbridge/axios-jwt",
   "author": "JetBridge Inc.",
   "license": "WTFPL",
   "devDependencies": {
@@ -20,5 +24,16 @@
   "scripts": {
     "build": "tsc",
     "start": "tsc -w"
-  }
+  },
+  "keywords": [
+    "axios",
+    "token",
+    "jwt",
+    "refresh",
+    "authentication",
+    "authorization",
+    "header",
+    "typescript",
+    "ts"
+  ]
 }
