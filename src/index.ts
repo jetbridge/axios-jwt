@@ -1,5 +1,5 @@
 import * as jwt from "jsonwebtoken";
-import { AxiosInstance, default as axiosRaw, AxiosRequestConfig } from "axios";
+import { AxiosInstance, AxiosRequestConfig } from "axios";
 
 // a little time before expiration to try refresh (seconds)
 const EXPIRE_FUDGE = 10;
@@ -10,9 +10,7 @@ export interface IAuthTokens {
   refreshToken: Token;
 }
 
-export const getTokenStorageKey = (): string =>
-  `auth-tokens-${process.env.NODE_ENV}`;
-
+// EXPORTS
 export const isLoggedIn = (): boolean => {
   const token = getRefreshToken();
   return !!token;
@@ -21,8 +19,24 @@ export const isLoggedIn = (): boolean => {
 export const setAuthTokens = (tokens: IAuthTokens) =>
   localStorage.setItem(getTokenStorageKey(), JSON.stringify(tokens));
 
+export const setAccessToken = (token: Token) => {
+  const tokens = getAuthTokens();
+  if (!tokens) {
+    console.warn(
+      "Trying to set new access token but no auth tokens found in storage. This should not happen."
+    );
+    return;
+  }
+
+  tokens.accessToken = token;
+  setAuthTokens(tokens);
+};
+
 export const clearAuthTokens = () =>
   localStorage.removeItem(getTokenStorageKey());
+
+// PRIVATE
+const getTokenStorageKey = (): string => `auth-tokens-${process.env.NODE_ENV}`;
 
 const getAuthTokens = (): IAuthTokens | undefined => {
   const tokensRaw = localStorage.getItem(getTokenStorageKey());
@@ -66,15 +80,15 @@ const getExpiresInFromJWT = (token: Token): number => {
 
 const refreshToken = async (
   requestRefresh: TokenRefreshRequest
-): Promise<IAuthTokens> => {
+): Promise<Token> => {
   const refreshToken = getRefreshToken();
   if (!refreshToken) return Promise.reject("No refresh token available");
 
   try {
     // do refresh with default axios client (we don't want our interceptor applied for refresh)
-    const res: IAuthTokens = await requestRefresh(refreshToken);
+    const res = await requestRefresh(refreshToken);
     // save tokens
-    setAuthTokens(res);
+    setAccessToken(res);
     return res;
   } catch (err) {
     // failed to refresh... check error type
@@ -91,9 +105,7 @@ const refreshToken = async (
   }
 };
 
-export type TokenRefreshRequest = (
-  refreshToken: string
-) => Promise<IAuthTokens>;
+export type TokenRefreshRequest = (refreshToken: string) => Promise<Token>;
 export interface IAuthTokenInterceptorConfig {
   header?: string;
   headerPrefix?: string;
@@ -117,9 +129,8 @@ const authTokenInterceptor = ({
   if (!accessToken || isTokenExpired(accessToken)) {
     // do refresh
     try {
-      const newTokens = await refreshToken(requestRefresh);
+      accessToken = await refreshToken(requestRefresh);
       // refresh ok. proceed
-      if (newTokens) accessToken = newTokens.accessToken;
     } catch (err) {
       return Promise.reject(
         `Unable to refresh access token for request: ${requestConfig} due to token refresh error: ${err}`
@@ -134,8 +145,9 @@ const authTokenInterceptor = ({
 };
 
 export const useAuthTokenInterceptor = (
-  axios: AxiosInstance,
+  axios: any,
   config: IAuthTokenInterceptorConfig
 ) => {
+  if (!axios.interceptors) throw new Error(`invalid axios instance: ${axios}`);
   axios.interceptors.request.use(authTokenInterceptor(config));
 };

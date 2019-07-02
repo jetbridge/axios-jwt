@@ -21,7 +21,6 @@ refresh and store a new access token is automatically performed before the reque
 ### Apply interceptor:
 
 ```typescript
-//
 import {
   IAuthTokens,
   TokenRefreshRequest,
@@ -34,7 +33,7 @@ import apiClient from "../apiClient";
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 if (!BASE_URL) throw new Error("BASE_URL is not defined");
 
-// type of response from refresh token endpoint
+// type of response from login endpoint
 export interface IAuthResponse {
   access_token: string;
   refresh_token: string;
@@ -44,7 +43,7 @@ export interface IAuthResponse {
 const refreshEndpoint = `${BASE_URL}/auth/refresh_token`;
 
 // transform response into IAuthTokens
-// this assumes your auth/refresh endpoints return `{"access_token": ..., "refresh_token": ...}`
+// this assumes your auth endpoint returns `{"access_token": ..., "refresh_token": ...}`
 export const authResponseToAuthTokens = (res: IAuthResponse): IAuthTokens => ({
   accessToken: res.access_token,
   refreshToken: res.refresh_token
@@ -53,12 +52,10 @@ export const authResponseToAuthTokens = (res: IAuthResponse): IAuthTokens => ({
 // define token refresh function
 const requestRefresh: TokenRefreshRequest = async (
   refreshToken: string
-): Promise<IAuthTokens> => {
+): Promise<string> => {
   // perform refresh
-  const res: IAuthResponse = (await axios.post(refreshEndpoint, {
-    token: refreshToken
-  })).data;
-  return authResponseToAuthTokens(res);
+  return (await axios.post(refreshEndpoint, { token: refreshToken })).data
+    .access_token;
 };
 
 // add interceptor to your axios instance
@@ -90,7 +87,7 @@ if (isLoggedIn()) {
 
 ```typescript
 {
-  requestRefresh,  // async function that takes refresh token and returns {accessToken, refreshToken}
+  requestRefresh,  // async function that takes refreshToken and returns a promise for a fresh accessToken
   header = "Authorization",  // header name
   headerPrefix = "Bearer ",  // header value prefix
 }
