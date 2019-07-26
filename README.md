@@ -65,7 +65,12 @@ useAuthTokenInterceptor(apiClient, { requestRefresh });
 ### Login/logout:
 
 ```typescript
-import { isLoggedIn, setAuthTokens, clearAuthTokens } from "axios-jwt";
+import {
+  isLoggedIn,
+  setAuthTokens,
+  clearAuthTokens,
+  getAuthTokens
+} from "axios-jwt";
 
 // login
 const login = async (params: ILoginRequest) => {
@@ -81,6 +86,9 @@ const logout = () => clearAuthTokens();
 if (isLoggedIn()) {
   // assume we are logged in because we have a refresh token
 }
+
+// get access to tokens
+const tokens = getAuthTokens();
 ```
 
 ## Configuration
