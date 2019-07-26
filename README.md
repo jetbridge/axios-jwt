@@ -69,7 +69,8 @@ import {
   isLoggedIn,
   setAuthTokens,
   clearAuthTokens,
-  getAuthTokens
+  getAccessToken,
+  getRefreshToken
 } from "axios-jwt";
 
 // login
@@ -88,7 +89,8 @@ if (isLoggedIn()) {
 }
 
 // get access to tokens
-const tokens = getAuthTokens();
+const accessToken = getAccessToken();
+const refreshToken = getRefreshToken();
 ```
 
 ## Configuration

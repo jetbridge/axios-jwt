@@ -37,8 +37,7 @@ export const clearAuthTokens = () =>
 
 // PRIVATE
 const getTokenStorageKey = (): string => `auth-tokens-${process.env.NODE_ENV}`;
-
-export const getAuthTokens = (): IAuthTokens | undefined => {
+const getAuthTokens = (): IAuthTokens | undefined => {
   const tokensRaw = localStorage.getItem(getTokenStorageKey());
   if (!tokensRaw) return;
 
@@ -50,6 +49,7 @@ export const getAuthTokens = (): IAuthTokens | undefined => {
   }
   return;
 };
+
 export const getRefreshToken = (): Token | undefined => {
   const tokens = getAuthTokens();
   return tokens ? tokens.refreshToken : undefined;
