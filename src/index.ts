@@ -38,7 +38,7 @@ export const clearAuthTokens = () =>
 // PRIVATE
 const getTokenStorageKey = (): string => `auth-tokens-${process.env.NODE_ENV}`;
 
-const getAuthTokens = (): IAuthTokens | undefined => {
+export const getAuthTokens = (): IAuthTokens | undefined => {
   const tokensRaw = localStorage.getItem(getTokenStorageKey());
   if (!tokensRaw) return;
 
