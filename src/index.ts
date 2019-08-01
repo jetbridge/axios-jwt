@@ -122,26 +122,36 @@ const authTokenInterceptor = ({
   // we need refresh token to do any authenticated requests
   if (!getRefreshToken()) return requestConfig;
 
-  // use access token (if we have it)
-  let accessToken = getAccessToken();
-
-  // check if access token is expired
-  if (!accessToken || isTokenExpired(accessToken)) {
-    // do refresh
-    try {
-      accessToken = await refreshToken(requestRefresh);
-      // refresh ok. proceed
-    } catch (err) {
-      return Promise.reject(
-        `Unable to refresh access token for request: ${requestConfig} due to token refresh error: ${err}`
-      );
-    }
+  // do refresh if needed
+  let accessToken;
+  try {
+    accessToken = await refreshTokenIfNeeded(requestRefresh);
+  } catch (err) {
+    console.warn(err);
+    return Promise.reject(
+      `Unable to refresh access token for request: ${requestConfig} due to token refresh error: ${err}`
+    );
   }
 
   // add token to headers
   if (accessToken)
     requestConfig.headers[header] = `${headerPrefix}${accessToken}`;
   return requestConfig;
+};
+
+export const refreshTokenIfNeeded = async (
+  requestRefresh: TokenRefreshRequest
+): Promise<Token | undefined> => {
+  // use access token (if we have it)
+  let accessToken = getAccessToken();
+
+  // check if access token is expired
+  if (!accessToken || isTokenExpired(accessToken)) {
+    // do refresh
+    accessToken = await refreshToken(requestRefresh);
+  }
+
+  return accessToken;
 };
 
 export const useAuthTokenInterceptor = (
