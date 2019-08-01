@@ -1,5 +1,5 @@
 import * as jwt from "jsonwebtoken";
-import { AxiosInstance, AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig } from "axios";
 
 // a little time before expiration to try refresh (seconds)
 const EXPIRE_FUDGE = 10;
