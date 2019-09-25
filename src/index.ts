@@ -86,7 +86,7 @@ const refreshToken = async (requestRefresh: TokenRefreshRequest): Promise<Token>
     return res
   } catch (err) {
     // failed to refresh... check error type
-    if (err && err.response && err.response.status === 401) {
+    if (err && err.response && (err.response.status === 401 || err.response.status === 422)) {
       // got invalid token response for sure, remove saved tokens because they're invalid
       localStorage.removeItem(getTokenStorageKey())
       return Promise.reject(`Got 401 on token refresh; Resetting auth token: ${err}`)
