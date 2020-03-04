@@ -132,5 +132,5 @@ useAuthTokenInterceptor(apiClient, { requestRefresh });  // Notice that this use
 // Now just make all requests from the apiClient.
 
 apiClient.get('/api/endpoint/resource/1')
-    .then(repsonse => { // blah blah })
+    .then(response => { // blah blah })
 ```
