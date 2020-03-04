@@ -107,3 +107,30 @@ const refreshToken = getRefreshToken();
 
 - If multiple requests happen simultaneously after token expiration then multiple refresh token requests may be issued.
 - Your backend should allow a few seconds of leeway between when the token expires and when it actually becomes unusable.
+
+## Non-TypeScript implementation
+
+```javascript
+import {useAuthTokenInterceptor} from 'axios-jwt';
+import axios from 'axios';
+
+const apiClient = axios.create();
+
+const requestRefresh = (refresh) => {
+    return new Promise((resolve, reject) => {
+        // notice that this is the global axios instance.  <-- important
+        axios.post('/api/v1/auth/token/refresh/', {
+            refresh
+        })
+            .then(response => {
+                resolve(response.data.accessToken);
+            }, reject);
+    });
+};
+useAuthTokenInterceptor(apiClient, { requestRefresh });  // Notice that this uses the apiClient instance.  <-- important
+
+// Now just make all requests from the apiClient.
+
+apiClient.get('/api/endpoint/resource/1')
+    .then(response => { // blah blah })
+```
