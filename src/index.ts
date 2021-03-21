@@ -1,6 +1,26 @@
 import * as jwt from 'jsonwebtoken'
 import { AxiosRequestConfig } from 'axios'
 
+type RequestsQueue = {
+  resolve: (value?: unknown) => void
+  reject: (reason?: unknown) => void
+}[]
+
+let isRefreshing: boolean = false
+let queue: RequestsQueue = []
+
+const processQueue = (error: Error | null, token: string | null = null) => {
+  queue.forEach((p) => {
+    if (error !== null) {
+      p.reject(error)
+    } else {
+      p.resolve(token)
+    }
+  })
+
+  queue = []
+}
+
 // a little time before expiration to try refresh (seconds)
 const EXPIRE_FUDGE = 10
 
@@ -112,11 +132,26 @@ const authTokenInterceptor = ({
   // we need refresh token to do any authenticated requests
   if (!getRefreshToken()) return requestConfig
 
+  // if it's refreshing prevent another 'refresh' request
+  if (isRefreshing) {
+    // add the request to the queue
+    return new Promise((resolve, reject) => {
+      queue.push({ resolve, reject })
+    })
+      .then((token) => {
+        requestConfig.headers[header] = `${headerPrefix}${token}`
+        return requestConfig
+      })
+      .catch(Promise.reject)
+  }
+
   // do refresh if needed
   let accessToken
   try {
     accessToken = await refreshTokenIfNeeded(requestRefresh)
+    processQueue(null, accessToken)
   } catch (err) {
+    processQueue(err, accessToken)
     console.warn(err)
     return Promise.reject(
       `Unable to refresh access token for request: ${requestConfig} due to token refresh error: ${err}`
