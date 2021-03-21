@@ -21,67 +21,54 @@ refresh and store a new access token is automatically performed before the reque
 ### Apply interceptor:
 
 ```typescript
-import {
-  IAuthTokens,
-  TokenRefreshRequest,
-  useAuthTokenInterceptor
-} from "axios-jwt";
-import axios from "axios";
+import { IAuthTokens, TokenRefreshRequest, useAuthTokenInterceptor } from 'axios-jwt'
+import axios from 'axios'
 // your axios instance that you wish to apply the interceptor to
-import apiClient from "../apiClient";
+import apiClient from '../apiClient'
 
-const BASE_URL = process.env.REACT_APP_BASE_URL;
-if (!BASE_URL) throw new Error("BASE_URL is not defined");
+const BASE_URL = process.env.REACT_APP_BASE_URL
+if (!BASE_URL) throw new Error('BASE_URL is not defined')
 
 // type of response from login endpoint
 export interface IAuthResponse {
-  access_token: string;
-  refresh_token: string;
+  access_token: string
+  refresh_token: string
 }
 
 // refresh token endpoint
-const refreshEndpoint = `${BASE_URL}/auth/refresh_token`;
+const refreshEndpoint = `${BASE_URL}/auth/refresh_token`
 
 // transform response into IAuthTokens
 // this assumes your auth endpoint returns `{"access_token": ..., "refresh_token": ...}`
 export const authResponseToAuthTokens = (res: IAuthResponse): IAuthTokens => ({
   accessToken: res.access_token,
-  refreshToken: res.refresh_token
-});
+  refreshToken: res.refresh_token,
+})
 
 // define token refresh function
-const requestRefresh: TokenRefreshRequest = async (
-  refreshToken: string
-): Promise<string> => {
+const requestRefresh: TokenRefreshRequest = async (refreshToken: string): Promise<string> => {
   // perform refresh
-  return (await axios.post(refreshEndpoint, { token: refreshToken })).data
-    .access_token;
-};
+  return (await axios.post(refreshEndpoint, { token: refreshToken })).data.access_token
+}
 
 // add interceptor to your axios instance
-useAuthTokenInterceptor(apiClient, { requestRefresh });
+useAuthTokenInterceptor(apiClient, { requestRefresh })
 ```
 
 ### Login/logout:
 
 ```typescript
-import {
-  isLoggedIn,
-  setAuthTokens,
-  clearAuthTokens,
-  getAccessToken,
-  getRefreshToken
-} from "axios-jwt";
+import { isLoggedIn, setAuthTokens, clearAuthTokens, getAccessToken, getRefreshToken } from 'axios-jwt'
 
 // login
 const login = async (params: ILoginRequest) => {
-  const res: IAuthResponse = (await axios.post("/auth/login", params)).data;
+  const res: IAuthResponse = (await axios.post('/auth/login', params)).data
   // save tokens to storage
-  setAuthTokens(authResponseToAuthTokens(res));
-};
+  setAuthTokens(authResponseToAuthTokens(res))
+}
 
 // to reset auth tokens
-const logout = () => clearAuthTokens();
+const logout = () => clearAuthTokens()
 
 // check if refresh token exists
 if (isLoggedIn()) {
@@ -89,8 +76,8 @@ if (isLoggedIn()) {
 }
 
 // get access to tokens
-const accessToken = getAccessToken();
-const refreshToken = getRefreshToken();
+const accessToken = getAccessToken()
+const refreshToken = getRefreshToken()
 ```
 
 ## Configuration
@@ -105,7 +92,6 @@ const refreshToken = getRefreshToken();
 
 ## Caveats
 
-- If multiple requests happen simultaneously after token expiration then multiple refresh token requests may be issued.
 - Your backend should allow a few seconds of leeway between when the token expires and when it actually becomes unusable.
 
 ## Non-TypeScript implementation
