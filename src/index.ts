@@ -99,6 +99,9 @@ const refreshToken = async (requestRefresh: TokenRefreshRequest): Promise<Token>
   if (!refreshToken) return Promise.reject('No refresh token available')
 
   try {
+    // Update the status
+    isRefreshing = true
+
     // do refresh with default axios client (we don't want our interceptor applied for refresh)
     const res = await requestRefresh(refreshToken)
     // save tokens
@@ -114,6 +117,8 @@ const refreshToken = async (requestRefresh: TokenRefreshRequest): Promise<Token>
       // some other error, probably network error
       return Promise.reject(`Failed to refresh auth token: ${err}`)
     }
+  } finally {
+    isRefreshing = false
   }
 }
 
