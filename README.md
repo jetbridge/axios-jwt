@@ -109,13 +109,27 @@ const apiClient = axios.create({ baseURL: BASE_URL })
 const requestRefresh = (refresh) => {
     // Notice that this is the global axios instance, not the apiClient!  <-- important
     return axios.post(`${BASE_URL}/auth/refresh_token`, { refresh })
-      .then(response => resolve(response.data.accessToken)
+      .then(response => resolve(response.data.access_token))
 };
 
+// 3. Apply interceptor
 applyAuthTokenInterceptor(apiClient, { requestRefresh });  // Notice that this uses the apiClient instance.  <-- important
 
-// Now just make all requests from the apiClient.
-apiClient.get('/api/endpoint/resource/1').then(response => {
-})
+// 4. Logging in
+const login = async (params) => {
+  const response = await apiClient.post('/auth/login', params)
+
+  // save tokens to storage
+  setAuthTokens({
+    accessToken: response.data.access_token,
+    refreshToken: response.data.refresh_token
+  })
+}
+
+// 5. Logging out
+const logout = () => clearAuthTokens()
+
+// Now just make all requests using your apiClient instance
+apiClient.get('/api/endpoint/that/requires/login').then(response => { })
 
 ```
