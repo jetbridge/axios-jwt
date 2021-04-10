@@ -12,7 +12,6 @@ describe('applyAuthTokenInterceptor', () => {
     // THEN
     // I expect an error to have been called
     expect(() => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       applyAuthTokenInterceptor(totallyNotAnAxiosInstance as any, { requestRefresh: jest.fn() })
     }).toThrow('invalid axios instance: [object Object]')
   })
