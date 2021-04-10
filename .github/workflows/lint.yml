@@ -1,0 +1,22 @@
+name: Lint code with eslint and prettier
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14.x'
+
+      - name: 'Install Dependencies'
+        id: install
+        run: npm install
+
+      - name: Run prettier
+        run: npm run prettier -c ./src
+
+      - name: Run eslint
+        run: npm run eslint ./src --color --max-warnings 0
