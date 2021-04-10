@@ -12,13 +12,26 @@ export interface IAuthTokens {
 }
 
 // EXPORTS
+
+/**
+ * Checks if refresh tokens are stored
+ * @returns Whether the user is logged in or not
+ */
 export const isLoggedIn = (): boolean => {
   const token = getRefreshToken()
   return !!token
 }
 
+/**
+ * Sets the access and refresh tokens
+ * @param {IAuthTokens} tokens - Access and Refresh tokens
+ */
 export const setAuthTokens = (tokens: IAuthTokens) => localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens))
 
+/**
+ * Sets the access token
+ * @param {string} token - Access token
+ */
 export const setAccessToken = (token: Token) => {
   const tokens = getAuthTokens()
   if (!tokens) {
@@ -30,12 +43,24 @@ export const setAccessToken = (token: Token) => {
   setAuthTokens(tokens)
 }
 
+/**
+ * Clears both tokens
+ */
 export const clearAuthTokens = () => localStorage.removeItem(STORAGE_KEY)
 
+/**
+ * Returns the stored refresh token
+ * @returns {string} Refresh token
+ */
 export const getRefreshToken = (): Token | undefined => {
   const tokens = getAuthTokens()
   return tokens ? tokens.refreshToken : undefined
 }
+
+/**
+ * Returns the stored access token
+ * @returns {string} Access token
+ */
 export const getAccessToken = (): Token | undefined => {
   const tokens = getAuthTokens()
   return tokens ? tokens.accessToken : undefined
@@ -48,8 +73,8 @@ export const getAccessToken = (): Token | undefined => {
  */
 
 /**
- * Get the current access token, exchange it with a new one if it's expired and then returns and return it.
- * @param {requestRefresh} requestRefresh - Fuction that is used to get a new access token
+ * Gets the current access token, exchanges it with a new one if it's expired and then returns the token.
+ * @param {requestRefresh} requestRefresh - Function that is used to get a new access token
  * @returns {string} Access token
  */
 export const refreshTokenIfNeeded = async (requestRefresh: TokenRefreshRequest): Promise<Token | undefined> => {
@@ -76,6 +101,11 @@ export const useAuthTokenInterceptor = (axios: any, config: IAuthTokenIntercepto
 }
 
 // PRIVATE
+
+/**
+ *  Returns the refresh and access tokens
+ * @returns {IAuthTokens} Object containing refresh and access tokens
+ */
 const getAuthTokens = (): IAuthTokens | undefined => {
   const tokensRaw = localStorage.getItem(STORAGE_KEY)
   if (!tokensRaw) return
@@ -88,19 +118,37 @@ const getAuthTokens = (): IAuthTokens | undefined => {
   }
   return
 }
+
+/**
+ * Checks if the token is undefined, has expired or is about the expire
+ *
+ * @param {string} token - Access token
+ * @returns Whether or not the token is undefined, has expired or is about the expire
+ */
 const isTokenExpired = (token: Token): boolean => {
   if (!token) return true
   const expiration = getExpiration(token) - EXPIRE_FUDGE
   return !expiration || expiration < 0
 }
 
-// gets unix TS
+/**
+ * Gets the unix timestamp from an access token
+ *
+ * @param {string} token - Access token
+ * @returns {string} Unix timestamp
+ */
 const getTimestampFromToken = (token: Token): number | undefined => {
   const decoded = jwt.decode(token)
   if (!decoded) return
   return (decoded as { [key: string]: number }).exp
 }
 
+/**
+ * Returns the number of seconds before the access token expires or -1 if it already has
+ *
+ * @param {string} token - Access token
+ * @returns {number} Number of seconds before the access token expires
+ */
 const getExpiration = (token: Token): number => {
   const exp = getTimestampFromToken(token)
   if (exp) return exp - Date.now() / 1000
@@ -108,6 +156,12 @@ const getExpiration = (token: Token): number => {
   return -1
 }
 
+/**
+ * Refreshes the access token using the provided function
+ *
+ * @param {requestRefresh} requestRefresh - Function that is used to get a new access token
+ * @returns {string} - Fresh access token
+ */
 const refreshToken = async (requestRefresh: TokenRefreshRequest): Promise<Token> => {
   const refreshToken = getRefreshToken()
   if (!refreshToken) return Promise.reject('No refresh token available')
@@ -117,10 +171,10 @@ const refreshToken = async (requestRefresh: TokenRefreshRequest): Promise<Token>
     isRefreshing = true
 
     // do refresh with default axios client (we don't want our interceptor applied for refresh)
-    const res = await requestRefresh(refreshToken)
+    const newToken = await requestRefresh(refreshToken)
     // save tokens
-    setAccessToken(res)
-    return res
+    setAccessToken(newToken)
+    return newToken
   } catch (err) {
     // failed to refresh... check error type
     if (err && err.response && (err.response.status === 401 || err.response.status === 422)) {
@@ -138,26 +192,6 @@ const refreshToken = async (requestRefresh: TokenRefreshRequest): Promise<Token>
 
 export type TokenRefreshRequest = (refreshToken: string) => Promise<Token>
 
-type RequestsQueue = {
-  resolve: (value?: unknown) => void
-  reject: (reason?: unknown) => void
-}[]
-
-let isRefreshing: boolean = false
-let queue: RequestsQueue = []
-
-const processQueue = (error: Error | null, token: string | null = null) => {
-  queue.forEach((p) => {
-    if (error !== null) {
-      p.reject(error)
-    } else {
-      p.resolve(token)
-    }
-  })
-
-  queue = []
-}
-
 export interface IAuthTokenInterceptorConfig {
   header?: string
   headerPrefix?: string
@@ -168,7 +202,7 @@ export interface IAuthTokenInterceptorConfig {
  * Function that returns an Axios Intercepter that:
  * - Applies that right auth header to requests
  * - Refreshes the access token when needed
- * - Puts subsequent requests in a queue and executes them after the access token has been refreshed.
+ * - Puts subsequent requests in a queue and executes them in order after the access token has been refreshed.
  *
  * @param {IAuthTokenInterceptorConfig} config - Configuration for the interceptor
  * @returns {Promise} Promise that resolves in the supplied requestConfig
@@ -198,9 +232,9 @@ const authTokenInterceptor = ({
   let accessToken
   try {
     accessToken = await refreshTokenIfNeeded(requestRefresh)
-    processQueue(null, accessToken)
+    resolveQueue(accessToken)
   } catch (err) {
-    processQueue(err, accessToken)
+    declineQueue(err)
     console.warn(err)
     return Promise.reject(
       `Unable to refresh access token for request: ${requestConfig} due to token refresh error: ${err}`
@@ -210,4 +244,36 @@ const authTokenInterceptor = ({
   // add token to headers
   if (accessToken) requestConfig.headers[header] = `${headerPrefix}${accessToken}`
   return requestConfig
+}
+
+type RequestsQueue = {
+  resolve: (value?: unknown) => void
+  reject: (reason?: unknown) => void
+}[]
+
+let isRefreshing: boolean = false
+let queue: RequestsQueue = []
+
+/**
+ * Function that resolves all items in the queue with the provided token
+ * @param token New access token
+ */
+const resolveQueue = (token?: string) => {
+  queue.forEach((p) => {
+    p.resolve(token)
+  })
+
+  queue = []
+}
+
+/**
+ * Function that declines all items in the queue with the provided error
+ * @param error Error
+ */
+const declineQueue = (error: Error) => {
+  queue.forEach((p) => {
+    p.reject(error)
+  })
+
+  queue = []
 }
