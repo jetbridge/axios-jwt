@@ -111,14 +111,15 @@ export const useAuthTokenInterceptor = applyAuthTokenInterceptor
  * @returns {IAuthTokens} Object containing refresh and access tokens
  */
 const getAuthTokens = (): IAuthTokens | undefined => {
-  const tokensRaw = localStorage.getItem(STORAGE_KEY)
-  if (!tokensRaw) return
+  const rawTokens = localStorage.getItem(STORAGE_KEY)
+  if (!rawTokens) return
 
   try {
     // parse stored tokens JSON
-    return JSON.parse(tokensRaw)
+    return JSON.parse(rawTokens)
   } catch (error) {
-    console.error('Failed to parse auth tokens: ', tokensRaw, error)
+    error.message = `Failed to parse auth tokens: ${rawTokens}`
+    throw error
   }
   return
 }
@@ -168,27 +169,26 @@ const getExpiresIn = (token: Token): number => {
  */
 const refreshToken = async (requestRefresh: TokenRefreshRequest): Promise<Token> => {
   const refreshToken = getRefreshToken()
-  if (!refreshToken) return Promise.reject('No refresh token available')
+  if (!refreshToken) throw new Error('No refresh token available')
 
   try {
-    // Update the status
     isRefreshing = true
 
-    // do refresh with default axios client (we don't want our interceptor applied for refresh)
+    // Refresh and store access token using the supplied refresh function
     const newToken = await requestRefresh(refreshToken)
-    // save tokens
     setAccessToken(newToken)
+
     return newToken
   } catch (error) {
-    // failed to refresh... check error type
+    // Failed to refresh token
     const status = error?.response?.status
     if (status === 401 || status === 422) {
-      // got invalid token response for sure, remove saved tokens because they're invalid
+      // The refresh token is invalid so remove the stored tokens
       localStorage.removeItem(STORAGE_KEY)
-      return Promise.reject(`Got 401 on token refresh; Resetting auth token: ${error}`)
+      throw new Error(`Got ${status} on token refresh; Resetting auth token}`)
     } else {
-      // some other error, probably network error
-      return Promise.reject(`Failed to refresh auth token: ${error}`)
+      // A different error, probably network error
+      throw new Error(`Failed to refresh auth token: ${error}`)
     }
   } finally {
     isRefreshing = false
@@ -217,12 +217,11 @@ const authTokenInterceptor = ({
   headerPrefix = 'Bearer ',
   requestRefresh,
 }: IAuthTokenInterceptorConfig) => async (requestConfig: AxiosRequestConfig): Promise<AxiosRequestConfig> => {
-  // we need refresh token to do any authenticated requests
+  // We need refresh token to do any authenticated requests
   if (!getRefreshToken()) return requestConfig
 
-  // if it's refreshing prevent another 'refresh' request
+  // Queue the request if another refresh request is currently happening
   if (isRefreshing) {
-    // add the request to the queue
     return new Promise((resolve, reject) => {
       queue.push({ resolve, reject })
     })
@@ -233,7 +232,7 @@ const authTokenInterceptor = ({
       .catch(Promise.reject)
   }
 
-  // do refresh if needed
+  // Do refresh if needed
   let accessToken
   try {
     accessToken = await refreshTokenIfNeeded(requestRefresh)
