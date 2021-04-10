@@ -14,68 +14,68 @@ refresh and store a new access token is automatically performed before the reque
 
 ## How do I use it?
 
-- Define a token refresh function
-- Configure the interceptor
-- Store tokens on login with `setAuthTokens()`
+1. Create an axios instance
+2. Define a token refresh function
+3. Configure the interceptor
+4. Store tokens on login with `setAuthTokens()`
+5. Clear tokens on logout with `clearAuthTokens()`
 
-### Apply interceptor
+### Applying the interceptor
 
 ```typescript
+// api.ts
+
 import { IAuthTokens, TokenRefreshRequest, applyAuthTokenInterceptor } from 'axios-jwt'
 import axios from 'axios'
-// your axios instance that you wish to apply the interceptor to
-import apiClient from '../apiClient'
 
-const BASE_URL = process.env.REACT_APP_BASE_URL
-if (!BASE_URL) throw new Error('BASE_URL is not defined')
+const BASE_URL = 'https://api.example.com'
 
-// type of response from login endpoint
-export interface IAuthResponse {
-  access_token: string
-  refresh_token: string
-}
+// 1. Create an axios instance that you wish to apply the interceptor to
+export const apiClient = axios.create({ baseURL: BASE_URL })
 
-// refresh token endpoint
-const refreshEndpoint = `${BASE_URL}/auth/refresh_token`
-
-// transform response into IAuthTokens
-// this assumes your auth endpoint returns `{"access_token": ..., "refresh_token": ...}`
-export const authResponseToAuthTokens = (res: IAuthResponse): IAuthTokens => ({
-  accessToken: res.access_token,
-  refreshToken: res.refresh_token,
-})
-
-// define token refresh function
+// 2. Define token refresh function.
 const requestRefresh: TokenRefreshRequest = async (refreshToken: string): Promise<string> => {
-  // perform refresh
-  return (await axios.post(refreshEndpoint, { token: refreshToken })).data.access_token
+
+  // Important! Do NOT use the axios instance that you supplied to applyAuthTokenInterceptor (in our case 'apiClient')
+  // because this will result in an infinite loop when trying to refresh the token.
+  // Use the global axios client or a different instance
+  const response = await axios.post(`${BASE_URL}/auth/refresh_token`, { token: refreshToken })
+
+  return response.data.access_token
 }
 
-// add interceptor to your axios instance
+// 3. Add interceptor to your axios instance
 applyAuthTokenInterceptor(apiClient, { requestRefresh })
 ```
 
 ### Login/logout
 
 ```typescript
-import { isLoggedIn, setAuthTokens, clearAuthTokens, getAccessToken, getRefreshToken } from 'axios-jwt'
+// login.ts
 
-// login
+import { isLoggedIn, setAuthTokens, clearAuthTokens, getAccessToken, getRefreshToken } from 'axios-jwt'
+import { apiClient } from '../apiClient'
+
+// 4. Post email and password and get tokens in return. Call setAuthTokens with the result.
 const login = async (params: ILoginRequest) => {
-  const res: IAuthResponse = (await axios.post('/auth/login', params)).data
+  const response = await apiClient.post('/auth/login', params)
+
   // save tokens to storage
-  setAuthTokens(authResponseToAuthTokens(res))
+  setAuthTokens({
+    accessToken: response.data.access_token,
+    refreshToken: response.data.refresh_token
+  })
 }
 
-// to reset auth tokens
+// 5. Clear the auth tokens from localstorage
 const logout = () => clearAuthTokens()
 
-// check if refresh token exists
+// Check if refresh token exists
 if (isLoggedIn()) {
   // assume we are logged in because we have a refresh token
 }
 
-// get access to tokens
+// Get access to tokens
 const accessToken = getAccessToken()
 const refreshToken = getRefreshToken()
 ```
@@ -83,11 +83,11 @@ const refreshToken = getRefreshToken()
 ## Configuration
 
 ```typescript
-{
-  requestRefresh,  // async function that takes refreshToken and returns a promise for a fresh accessToken
+applyAuthTokenInterceptor(apiClient, {
+  requestRefresh,  // async function that takes a refreshToken and returns a promise the resolves in a fresh accessToken
   header = "Authorization",  // header name
   headerPrefix = "Bearer ",  // header value prefix
-}
+})
 ```
 
 ## Caveats
@@ -97,26 +97,25 @@ const refreshToken = getRefreshToken()
 ## Non-TypeScript implementation
 
 ```javascript
-import {applyAuthTokenInterceptor} from 'axios-jwt';
+import { applyAuthTokenInterceptor } from 'axios-jwt';
 import axios from 'axios';
 
-const apiClient = axios.create();
+const BASE_URL = 'https://api.example.com'
 
+// 1. Create an axios instance that you wish to apply the interceptor to
+const apiClient = axios.create({ baseURL: BASE_URL })
+
+// 2. Define token refresh function.
 const requestRefresh = (refresh) => {
-    return new Promise((resolve, reject) => {
-        // notice that this is the global axios instance.  <-- important
-        axios.post('/api/v1/auth/token/refresh/', {
-            refresh
-        })
-            .then(response => {
-                resolve(response.data.accessToken);
-            }, reject);
-    });
+    // Notice that this is the global axios instance, not the apiClient!  <-- important
+    return axios.post(`${BASE_URL}/auth/refresh_token`, { refresh })
+      .then(response => resolve(response.data.accessToken)
 };
+
 applyAuthTokenInterceptor(apiClient, { requestRefresh });  // Notice that this uses the apiClient instance.  <-- important
 
 // Now just make all requests from the apiClient.
+apiClient.get('/api/endpoint/resource/1').then(response => {
+})
 
-apiClient.get('/api/endpoint/resource/1')
-    .then(response => { // blah blah })
 ```
