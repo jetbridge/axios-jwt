@@ -21,7 +21,7 @@ refresh and store a new access token is automatically performed before the reque
 ### Apply interceptor:
 
 ```typescript
-import { IAuthTokens, TokenRefreshRequest, useAuthTokenInterceptor } from 'axios-jwt'
+import { IAuthTokens, TokenRefreshRequest, applyAuthTokenInterceptor } from 'axios-jwt'
 import axios from 'axios'
 // your axios instance that you wish to apply the interceptor to
 import apiClient from '../apiClient'
@@ -52,7 +52,7 @@ const requestRefresh: TokenRefreshRequest = async (refreshToken: string): Promis
 }
 
 // add interceptor to your axios instance
-useAuthTokenInterceptor(apiClient, { requestRefresh })
+applyAuthTokenInterceptor(apiClient, { requestRefresh })
 ```
 
 ### Login/logout:
@@ -97,7 +97,7 @@ const refreshToken = getRefreshToken()
 ## Non-TypeScript implementation
 
 ```javascript
-import {useAuthTokenInterceptor} from 'axios-jwt';
+import {applyAuthTokenInterceptor} from 'axios-jwt';
 import axios from 'axios';
 
 const apiClient = axios.create();
@@ -113,7 +113,7 @@ const requestRefresh = (refresh) => {
             }, reject);
     });
 };
-useAuthTokenInterceptor(apiClient, { requestRefresh });  // Notice that this uses the apiClient instance.  <-- important
+applyAuthTokenInterceptor(apiClient, { requestRefresh });  // Notice that this uses the apiClient instance.  <-- important
 
 // Now just make all requests from the apiClient.
 

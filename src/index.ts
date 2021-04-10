@@ -95,10 +95,15 @@ export const refreshTokenIfNeeded = async (requestRefresh: TokenRefreshRequest):
  * @param {Axios} axios - Axios instance to apply the interceptor to
  * @param {IAuthTokenInterceptorConfig} config - Configuration for the interceptor
  */
-export const useAuthTokenInterceptor = (axios: any, config: IAuthTokenInterceptorConfig) => {
+export const applyAuthTokenInterceptor = (axios: any, config: IAuthTokenInterceptorConfig) => {
   if (!axios.interceptors) throw new Error(`invalid axios instance: ${axios}`)
   axios.interceptors.request.use(authTokenInterceptor(config))
 }
+
+/**
+ * @deprecated This method has been renamed to applyAuthTokenInterceptor and will be removed in a future release.
+ */
+export const useAuthTokenInterceptor = applyAuthTokenInterceptor
 
 // PRIVATE
 
