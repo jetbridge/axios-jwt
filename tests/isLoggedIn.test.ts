@@ -1,10 +1,10 @@
-import { isLoggedIn } from '../src'
+import { STORAGE_KEY, isLoggedIn } from '../src'
 
 describe('isLoggedIn', () => {
   it('returns false if tokens are not set', () => {
     // GIVEN
     // localStorage is empty
-    localStorage.removeItem('auth-tokens-test')
+    localStorage.removeItem(STORAGE_KEY)
 
     // WHEN
     // I call isLoggedIn
@@ -19,7 +19,7 @@ describe('isLoggedIn', () => {
     // GIVEN
     // Both tokens are stored in localstorage
     const tokens = { accessToken: 'accesstoken', refreshToken: 'refreshtoken' }
-    localStorage.setItem('auth-tokens-test', JSON.stringify(tokens))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens))
 
     // WHEN
     // I call isLoggedIn

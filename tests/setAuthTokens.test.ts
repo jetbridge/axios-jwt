@@ -1,10 +1,10 @@
-import { setAuthTokens } from '../src'
+import { STORAGE_KEY, setAuthTokens } from '../src'
 
 describe('setAuthTokens', () => {
   it('stores the tokens in localstorage', () => {
     // GIVEN
     // localStorage is empty
-    localStorage.removeItem('auth-tokens-test')
+    localStorage.removeItem(STORAGE_KEY)
 
     // WHEN
     // I call setAuthTokens
@@ -13,7 +13,7 @@ describe('setAuthTokens', () => {
 
     // THEN
     // I expect them to have been stored in localstorage
-    const storedTokens = localStorage.getItem('auth-tokens-test') as string
+    const storedTokens = localStorage.getItem(STORAGE_KEY) as string
     expect(JSON.parse(storedTokens)).toEqual(tokens)
   })
 })

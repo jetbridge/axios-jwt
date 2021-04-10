@@ -1,10 +1,10 @@
-import { getRefreshToken } from '../src'
+import { STORAGE_KEY, getRefreshToken } from '../src'
 
 describe('getRefreshToken', () => {
   it('returns undefined if tokens are not set', () => {
     // GIVEN
     // localStorage is empty
-    localStorage.removeItem('auth-tokens-test')
+    localStorage.removeItem(STORAGE_KEY)
 
     // WHEN
     // I call getRefreshToken
@@ -19,7 +19,7 @@ describe('getRefreshToken', () => {
     // GIVEN
     // Both tokens are stored in localstorage
     const tokens = { accessToken: 'accesstoken', refreshToken: 'refreshtoken' }
-    localStorage.setItem('auth-tokens-test', JSON.stringify(tokens))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens))
 
     // WHEN
     // I call getRefreshToken

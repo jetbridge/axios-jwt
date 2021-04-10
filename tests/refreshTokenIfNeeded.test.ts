@@ -1,4 +1,4 @@
-import { refreshTokenIfNeeded } from '../src'
+import { STORAGE_KEY, refreshTokenIfNeeded } from '../src'
 import jwt from 'jsonwebtoken'
 
 describe('refreshTokenIfNeeded', () => {
@@ -15,7 +15,7 @@ describe('refreshTokenIfNeeded', () => {
 
     // and this token is stored in local storage
     const tokens = { accessToken: expiredToken, refreshToken: 'refreshtoken' }
-    localStorage.setItem('auth-tokens-test', JSON.stringify(tokens))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens))
 
     // and I have a requestRefresh function that throws an error
     const requestRefresh = async () => {
@@ -47,7 +47,7 @@ describe('refreshTokenIfNeeded', () => {
 
     // and this token is stored in local storage
     const tokens = { accessToken: expiredToken, refreshToken: 'refreshtoken' }
-    localStorage.setItem('auth-tokens-test', JSON.stringify(tokens))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens))
 
     // and I have a requestRefresh function that throws an error
     const requestRefresh = async () => {
@@ -70,7 +70,7 @@ describe('refreshTokenIfNeeded', () => {
     // I expect the error handler to have been called with the right error
     expect(catchFn).toHaveBeenLastCalledWith(new Error('Got 401 on token refresh; clearing both auth tokens'))
     // and the storage to have been cleared
-    expect(localStorage.getItem('auth-tokens-test')).toBeNull()
+    expect(localStorage.getItem(STORAGE_KEY)).toBeNull()
   })
 
   it('throws an error and clears the storage if the requestRefresh function throws an error with a 422 status code', async () => {
@@ -86,7 +86,7 @@ describe('refreshTokenIfNeeded', () => {
 
     // and this token is stored in local storage
     const tokens = { accessToken: expiredToken, refreshToken: 'refreshtoken' }
-    localStorage.setItem('auth-tokens-test', JSON.stringify(tokens))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens))
 
     // and I have a requestRefresh function that throws an error
     const requestRefresh = async () => {
@@ -109,7 +109,7 @@ describe('refreshTokenIfNeeded', () => {
     // I expect the error handler to have been called with the right error
     expect(catchFn).toHaveBeenLastCalledWith(new Error('Got 422 on token refresh; clearing both auth tokens'))
     // and the storage to have been cleared
-    expect(localStorage.getItem('auth-tokens-test')).toBeNull()
+    expect(localStorage.getItem(STORAGE_KEY)).toBeNull()
   })
 
   it('refreshes the access token if it does not have an expiration', async () => {
@@ -124,7 +124,7 @@ describe('refreshTokenIfNeeded', () => {
 
     // and this token is stored in local storage
     const tokens = { accessToken: expiredToken, refreshToken: 'refreshtoken' }
-    localStorage.setItem('auth-tokens-test', JSON.stringify(tokens))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens))
 
     // and I have a requestRefresh function that returns an access token
     const requestRefresh = async () => 'newaccesstoken'
@@ -135,7 +135,7 @@ describe('refreshTokenIfNeeded', () => {
 
     // THEN
     // I expect the stored access token to have been updated
-    const storedTokens = localStorage.getItem('auth-tokens-test') as string
+    const storedTokens = localStorage.getItem(STORAGE_KEY) as string
     expect(JSON.parse(storedTokens)).toEqual({ accessToken: 'newaccesstoken', refreshToken: 'refreshtoken' })
 
     // and the result to be the new access token
@@ -155,7 +155,7 @@ describe('refreshTokenIfNeeded', () => {
 
     // and this token is stored in local storage
     const tokens = { accessToken: expiredToken, refreshToken: 'refreshtoken' }
-    localStorage.setItem('auth-tokens-test', JSON.stringify(tokens))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens))
 
     // and I have a requestRefresh function that returns an access token
     const requestRefresh = async () => 'newaccesstoken'
@@ -166,7 +166,7 @@ describe('refreshTokenIfNeeded', () => {
 
     // THEN
     // I expect the stored access token to have been updated
-    const storedTokens = localStorage.getItem('auth-tokens-test') as string
+    const storedTokens = localStorage.getItem(STORAGE_KEY) as string
     expect(JSON.parse(storedTokens)).toEqual({ accessToken: 'newaccesstoken', refreshToken: 'refreshtoken' })
 
     // and the result to be the new access token

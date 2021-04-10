@@ -1,10 +1,10 @@
-import { setAccessToken } from '../src'
+import { STORAGE_KEY, setAccessToken } from '../src'
 
 describe('setAccessToken', () => {
   it('throws an error if there are no tokens stored', () => {
     // GIVEN
     // localStorage is empty
-    localStorage.removeItem('auth-tokens-test')
+    localStorage.removeItem(STORAGE_KEY)
 
     // WHEN
     // I call setAccessToken
@@ -18,7 +18,7 @@ describe('setAccessToken', () => {
   it('throws an error if the stored tokens cannot be parsed', () => {
     // GIVEN
     // localStorage is empty
-    localStorage.setItem('auth-tokens-test', 'totallynotjson')
+    localStorage.setItem(STORAGE_KEY, 'totallynotjson')
 
     // WHEN
     // I call setAuthTokens
@@ -33,7 +33,7 @@ describe('setAccessToken', () => {
     // GIVEN
     // localStorage is empty
     const tokens = { accessToken: 'accesstoken', refreshToken: 'refreshtoken' }
-    localStorage.setItem('auth-tokens-test', JSON.stringify(tokens))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens))
 
     // WHEN
     // I call setAccessToken
@@ -41,7 +41,7 @@ describe('setAccessToken', () => {
 
     // THEN
     // I expect the stored access token to have been updated
-    const storedTokens = localStorage.getItem('auth-tokens-test') as string
+    const storedTokens = localStorage.getItem(STORAGE_KEY) as string
     expect(JSON.parse(storedTokens)).toEqual({ accessToken: 'newaccesstoken', refreshToken: 'refreshtoken' })
   })
 })

@@ -3,7 +3,7 @@ import { AxiosInstance, AxiosRequestConfig } from 'axios'
 
 // a little time before expiration to try refresh (seconds)
 const EXPIRE_FUDGE = 10
-const STORAGE_KEY = `auth-tokens-${process.env.NODE_ENV}`
+export const STORAGE_KEY = `auth-tokens-${process.env.NODE_ENV}`
 
 type Token = string
 export interface IAuthTokens {
