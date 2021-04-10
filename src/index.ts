@@ -83,6 +83,7 @@ export const refreshTokenIfNeeded = async (requestRefresh: TokenRefreshRequest):
   // check if access token is expired
   if (!accessToken || isTokenExpired(accessToken)) {
     // do refresh
+
     accessToken = await refreshToken(requestRefresh)
   }
 
@@ -121,7 +122,6 @@ const getAuthTokens = (): IAuthTokens | undefined => {
     error.message = `Failed to parse auth tokens: ${rawTokens}`
     throw error
   }
-  return
 }
 
 /**
@@ -143,9 +143,9 @@ const isTokenExpired = (token: Token): boolean => {
  * @returns {string} Unix timestamp
  */
 const getTimestampFromToken = (token: Token): number | undefined => {
-  const decoded = jwt.decode(token)
-  if (!decoded) return
-  return (decoded as { [key: string]: number }).exp
+  const decoded = jwt.decode(token) as { [key: string]: number }
+
+  return decoded?.exp
 }
 
 /**
@@ -156,9 +156,10 @@ const getTimestampFromToken = (token: Token): number | undefined => {
  */
 const getExpiresIn = (token: Token): number => {
   const expiration = getTimestampFromToken(token)
-  if (expiration) return expiration - Date.now() / 1000
 
-  return -1
+  if (!expiration) return -1
+
+  return expiration - Date.now() / 1000
 }
 
 /**
@@ -185,10 +186,10 @@ const refreshToken = async (requestRefresh: TokenRefreshRequest): Promise<Token>
     if (status === 401 || status === 422) {
       // The refresh token is invalid so remove the stored tokens
       localStorage.removeItem(STORAGE_KEY)
-      throw new Error(`Got ${status} on token refresh; Resetting auth token}`)
+      throw new Error(`Got ${status} on token refresh; clearing both auth tokens`)
     } else {
       // A different error, probably network error
-      throw new Error(`Failed to refresh auth token: ${error}`)
+      throw new Error(`Failed to refresh auth token: ${error.message}`)
     }
   } finally {
     isRefreshing = false
@@ -212,7 +213,7 @@ export interface IAuthTokenInterceptorConfig {
  * @param {IAuthTokenInterceptorConfig} config - Configuration for the interceptor
  * @returns {Promise} Promise that resolves in the supplied requestConfig
  */
-const authTokenInterceptor = ({
+export const authTokenInterceptor = ({
   header = 'Authorization',
   headerPrefix = 'Bearer ',
   requestRefresh,
@@ -237,12 +238,9 @@ const authTokenInterceptor = ({
   try {
     accessToken = await refreshTokenIfNeeded(requestRefresh)
     resolveQueue(accessToken)
-  } catch (err) {
-    declineQueue(err)
-    console.warn(err)
-    return Promise.reject(
-      `Unable to refresh access token for request: ${requestConfig} due to token refresh error: ${err}`
-    )
+  } catch (error) {
+    declineQueue(error)
+    throw new Error(`Unable to refresh access token for request due to token refresh error: ${error.message}`)
   }
 
   // add token to headers

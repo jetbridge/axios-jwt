@@ -15,6 +15,20 @@ describe('setAccessToken', () => {
     }).toThrow('Unable to update access token since there are not tokens currently stored')
   })
 
+  it('throws an error if the stored tokens cannot be parsed', () => {
+    // GIVEN
+    // localStorage is empty
+    localStorage.setItem('auth-tokens-test', 'totallynotjson')
+
+    // WHEN
+    // I call setAuthTokens
+    // THEN
+    // I expect an error to be thrown
+    expect(() => {
+      setAccessToken('accesstoken')
+    }).toThrow('Failed to parse auth tokens: totallynotjson')
+  })
+
   it('stores the tokens in localstorage', () => {
     // GIVEN
     // localStorage is empty
