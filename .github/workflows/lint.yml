@@ -16,7 +16,7 @@ jobs:
         run: npm install
 
       - name: Run prettier
-        run: npm run prettier -c ./src
+        run: ./node_modules/.bin/prettier -c ./src
 
       - name: Run eslint
-        run: npm run eslint ./src --color --max-warnings 0
+        run: ./node_modules/.bin/eslint ./src --color --max-warnings 0
