@@ -9,7 +9,6 @@ describe('applyAuthTokenInterceptor', () => {
 
     // WHEN
     // I call applyAuthTokenInterceptor
-
     // THEN
     // I expect an error to have been called
     expect(() => {
