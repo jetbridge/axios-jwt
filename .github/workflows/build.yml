@@ -1,11 +1,6 @@
 name: Build
-on:
-  push:
-    branches:
-      - 'master'
-  pull_request_target:
-    branches:
-      - 'master'
+
+on: [push]
 
 jobs:
   build:
@@ -18,8 +13,8 @@ jobs:
 
       - name: 'Install Dependencies'
         id: install
-        run: yarn
+        run: npm install
 
       - name: 'Build Project'
         id: build
-        run: yarn build
+        run: npm run build
