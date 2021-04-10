@@ -282,3 +282,8 @@ const declineQueue = (error: Error) => {
 
   queue = []
 }
+
+/**
+ * @deprecated This method has been renamed to applyAuthTokenInterceptor and will be removed in a future release.
+ */
+export const useAuthTokenInterceptor = applyAuthTokenInterceptor
