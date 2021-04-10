@@ -32,7 +32,8 @@
   "scripts": {
     "build": "tsc",
     "start": "tsc -w",
-    "test": "jest"
+    "test": "jest",
+    "prepack": "tsc"
   },
   "keywords": [
     "axios",
