@@ -35,8 +35,7 @@ export const setAuthTokens = (tokens: IAuthTokens): void => localStorage.setItem
 export const setAccessToken = (token: Token): void => {
   const tokens = getAuthTokens()
   if (!tokens) {
-    console.warn('Trying to set new access token but no auth tokens found in storage. This should not happen.')
-    return
+    throw new Error('Unable to update access token since there are not tokens currently stored')
   }
 
   tokens.accessToken = token

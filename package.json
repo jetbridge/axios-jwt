@@ -12,13 +12,20 @@
   "author": "JetBridge Inc.",
   "license": "WTFPL",
   "devDependencies": {
+    "@babel/core": "^7.13.15",
+    "@babel/preset-env": "^7.13.15",
+    "@babel/preset-typescript": "^7.13.0",
     "@types/axios": "^0.14.0",
+    "@types/jest": "^26.0.22",
     "@types/jsonwebtoken": "^8.5.1",
     "@typescript-eslint/eslint-plugin": "^4.21.0",
     "@typescript-eslint/parser": "^4.21.0",
+    "babel-jest": "^26.6.3",
     "eslint": "^7.24.0",
     "jest": "^26.6.3",
     "prettier": "^2.2.1",
+    "rewire": "^5.0.0",
+    "ts-node": "^9.1.1",
     "typescript": "^4.2.4"
   },
   "peerDependencies": {
@@ -30,7 +37,24 @@
   "scripts": {
     "build": "tsc",
     "start": "tsc -w",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "test": "jest"
+  },
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "targets": {
+            "node": "current"
+          }
+        }
+      ],
+      "@babel/preset-typescript"
+    ]
+  },
+  "jest": {
+    "clearMocks": true
   },
   "keywords": [
     "axios",
