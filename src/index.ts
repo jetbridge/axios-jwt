@@ -118,8 +118,8 @@ const getAuthTokens = (): IAuthTokens | undefined => {
   try {
     // parse stored tokens JSON
     return JSON.parse(tokensRaw)
-  } catch (err) {
-    console.error('Failed to parse auth tokens: ', tokensRaw, err)
+  } catch (error) {
+    console.error('Failed to parse auth tokens: ', tokensRaw, error)
   }
   return
 }
@@ -132,8 +132,8 @@ const getAuthTokens = (): IAuthTokens | undefined => {
  */
 const isTokenExpired = (token: Token): boolean => {
   if (!token) return true
-  const expiration = getExpiration(token) - EXPIRE_FUDGE
-  return !expiration || expiration < 0
+  const expiresIn = getExpiresIn(token)
+  return !expiresIn || expiresIn <= EXPIRE_FUDGE
 }
 
 /**
@@ -154,9 +154,9 @@ const getTimestampFromToken = (token: Token): number | undefined => {
  * @param {string} token - Access token
  * @returns {number} Number of seconds before the access token expires
  */
-const getExpiration = (token: Token): number => {
-  const exp = getTimestampFromToken(token)
-  if (exp) return exp - Date.now() / 1000
+const getExpiresIn = (token: Token): number => {
+  const expiration = getTimestampFromToken(token)
+  if (expiration) return expiration - Date.now() / 1000
 
   return -1
 }
@@ -180,15 +180,16 @@ const refreshToken = async (requestRefresh: TokenRefreshRequest): Promise<Token>
     // save tokens
     setAccessToken(newToken)
     return newToken
-  } catch (err) {
+  } catch (error) {
     // failed to refresh... check error type
-    if (err && err.response && (err.response.status === 401 || err.response.status === 422)) {
+    const status = error?.response?.status
+    if (status === 401 || status === 422) {
       // got invalid token response for sure, remove saved tokens because they're invalid
       localStorage.removeItem(STORAGE_KEY)
-      return Promise.reject(`Got 401 on token refresh; Resetting auth token: ${err}`)
+      return Promise.reject(`Got 401 on token refresh; Resetting auth token: ${error}`)
     } else {
       // some other error, probably network error
-      return Promise.reject(`Failed to refresh auth token: ${err}`)
+      return Promise.reject(`Failed to refresh auth token: ${error}`)
     }
   } finally {
     isRefreshing = false
