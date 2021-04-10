@@ -1,5 +1,5 @@
 import * as jwt from 'jsonwebtoken'
-import { AxiosRequestConfig } from 'axios'
+import { AxiosInstance, AxiosRequestConfig } from 'axios'
 
 // a little time before expiration to try refresh (seconds)
 const EXPIRE_FUDGE = 10
@@ -26,13 +26,13 @@ export const isLoggedIn = (): boolean => {
  * Sets the access and refresh tokens
  * @param {IAuthTokens} tokens - Access and Refresh tokens
  */
-export const setAuthTokens = (tokens: IAuthTokens) => localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens))
+export const setAuthTokens = (tokens: IAuthTokens): void => localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens))
 
 /**
  * Sets the access token
  * @param {string} token - Access token
  */
-export const setAccessToken = (token: Token) => {
+export const setAccessToken = (token: Token): void => {
   const tokens = getAuthTokens()
   if (!tokens) {
     console.warn('Trying to set new access token but no auth tokens found in storage. This should not happen.')
@@ -46,7 +46,7 @@ export const setAccessToken = (token: Token) => {
 /**
  * Clears both tokens
  */
-export const clearAuthTokens = () => localStorage.removeItem(STORAGE_KEY)
+export const clearAuthTokens = (): void => localStorage.removeItem(STORAGE_KEY)
 
 /**
  * Returns the stored refresh token
@@ -95,7 +95,7 @@ export const refreshTokenIfNeeded = async (requestRefresh: TokenRefreshRequest):
  * @param {Axios} axios - Axios instance to apply the interceptor to
  * @param {IAuthTokenInterceptorConfig} config - Configuration for the interceptor
  */
-export const applyAuthTokenInterceptor = (axios: any, config: IAuthTokenInterceptorConfig) => {
+export const applyAuthTokenInterceptor = (axios: AxiosInstance, config: IAuthTokenInterceptorConfig): void => {
   if (!axios.interceptors) throw new Error(`invalid axios instance: ${axios}`)
   axios.interceptors.request.use(authTokenInterceptor(config))
 }
@@ -257,7 +257,7 @@ type RequestsQueue = {
   reject: (reason?: unknown) => void
 }[]
 
-let isRefreshing: boolean = false
+let isRefreshing = false
 let queue: RequestsQueue = []
 
 /**

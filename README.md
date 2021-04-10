@@ -18,7 +18,7 @@ refresh and store a new access token is automatically performed before the reque
 - Configure the interceptor
 - Store tokens on login with `setAuthTokens()`
 
-### Apply interceptor:
+### Apply interceptor
 
 ```typescript
 import { IAuthTokens, TokenRefreshRequest, applyAuthTokenInterceptor } from 'axios-jwt'
@@ -55,7 +55,7 @@ const requestRefresh: TokenRefreshRequest = async (refreshToken: string): Promis
 applyAuthTokenInterceptor(apiClient, { requestRefresh })
 ```
 
-### Login/logout:
+### Login/logout
 
 ```typescript
 import { isLoggedIn, setAuthTokens, clearAuthTokens, getAccessToken, getRefreshToken } from 'axios-jwt'
