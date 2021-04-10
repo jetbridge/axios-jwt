@@ -169,7 +169,7 @@ describe('authTokenInterceptor', () => {
 
   it('puts requests in the queue while tokens are being refreshed', async () => {
     // GIVEN
-    // We are count the number of times a token is being refreshed
+    // We are counting the number of times a token is being refreshed
     let refreshes = 0
 
     // I have an access token that expired an hour ago
