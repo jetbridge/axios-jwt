@@ -1,0 +1,54 @@
+name: Build, lint and test
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14.x'
+
+      - name: 'Install Dependencies'
+        id: install
+        run: npm install
+
+      - name: Run prettier
+        run: ./node_modules/.bin/prettier -c ./src
+
+      - name: Run eslint
+        run: ./node_modules/.bin/eslint ./src --color --max-warnings 0
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14.x'
+
+      - name: 'Install Dependencies'
+        id: install
+        run: npm install
+
+      - name: 'Build Project'
+        id: build
+        run: npm run build
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14.x'
+
+      - name: 'Install Dependencies'
+        id: install
+        run: npm install
+
+      - name: Run rests
+        run: npm run test
+
