@@ -202,7 +202,7 @@ const refreshToken = async (requestRefresh: TokenRefreshRequest): Promise<Token>
   }
 }
 
-export type TokenRefreshRequest = (refreshToken: string) => Promise<Token | IAuthTokens>
+export type TokenRefreshRequest = (refreshToken: Token) => Promise<Token | IAuthTokens>
 
 export interface IAuthTokenInterceptorConfig {
   header?: string
@@ -266,7 +266,7 @@ let queue: RequestsQueue = []
  * Function that resolves all items in the queue with the provided token
  * @param token New access token
  */
-const resolveQueue = (token?: string) => {
+const resolveQueue = (token?: Token) => {
   queue.forEach((p) => {
     p.resolve(token)
   })
