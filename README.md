@@ -1,6 +1,6 @@
 # axios-jwt
 
-Store, clear, transmit and automatically refresh JWT authentication tokens.
+Store, clear, transmit and automatically refresh JWT authentication tokens. This library can be used in both web and react-native projects.
 
 ## What does it do?
 
@@ -11,6 +11,31 @@ It stores `accessToken` and `refreshToken` in `localStorage` and reads them when
 
 It parses the expiration time of your access token and checks to see if it is expired before every request. If it has expired, a request to
 refresh and store a new access token is automatically performed before the request proceeds.
+
+## Installation instructions
+
+### Install axios-jwt
+
+```bash
+npm install --save axios-jwt # or `yarn add axios-jwt`
+```
+
+### Additional steps for React Native projects
+
+You will also need to install react-native-async-storage in order to be able to store and retrieve tokens.
+
+#### Expo
+
+```bash
+expo install @react-native-async-storage/async-storage
+```
+
+### React Native
+
+```bash
+npm install --save @react-native-async-storage/async-storage # or `yarn add @react-native-async-storage/async-storage`
+npx pod-install # installs the native iOS packages
+```
 
 ## How do I use it?
 
