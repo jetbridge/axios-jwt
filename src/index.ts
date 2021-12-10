@@ -118,7 +118,8 @@ const getAuthTokens = (): IAuthTokens | undefined => {
   try {
     // parse stored tokens JSON
     return JSON.parse(rawTokens)
-  } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
     error.message = `Failed to parse auth tokens: ${rawTokens}`
     throw error
   }
@@ -186,7 +187,8 @@ const refreshToken = async (requestRefresh: TokenRefreshRequest): Promise<Token>
     }
 
     throw new Error('requestRefresh must either return a string or an object with an accessToken')
-  } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
     // Failed to refresh token
     const status = error?.response?.status
     if (status === 401 || status === 422) {
@@ -231,7 +233,9 @@ export const authTokenInterceptor =
         queue.push({ resolve, reject })
       })
         .then((token) => {
-          requestConfig.headers[header] = `${headerPrefix}${token}`
+          if (requestConfig.headers) {
+            requestConfig.headers[header] = `${headerPrefix}${token}`
+          }
           return requestConfig
         })
         .catch(Promise.reject)
@@ -242,13 +246,14 @@ export const authTokenInterceptor =
     try {
       accessToken = await refreshTokenIfNeeded(requestRefresh)
       resolveQueue(accessToken)
-    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       declineQueue(error)
       throw new Error(`Unable to refresh access token for request due to token refresh error: ${error.message}`)
     }
 
     // add token to headers
-    if (accessToken) requestConfig.headers[header] = `${headerPrefix}${accessToken}`
+    if (accessToken && requestConfig.headers) requestConfig.headers[header] = `${headerPrefix}${accessToken}`
     return requestConfig
   }
 
