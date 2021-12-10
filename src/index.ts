@@ -1,4 +1,4 @@
-import { AxiosInstance, AxiosRequestConfig } from 'axios'
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
 import jwtDecode from 'jwt-decode'
 
 // a little time before expiration to try refresh (seconds)
@@ -118,10 +118,11 @@ const getAuthTokens = (): IAuthTokens | undefined => {
   try {
     // parse stored tokens JSON
     return JSON.parse(rawTokens)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    error.message = `Failed to parse auth tokens: ${rawTokens}`
-    throw error
+  } catch (error: unknown) {
+    if (error instanceof SyntaxError) {
+      error.message = `Failed to parse auth tokens: ${rawTokens}`
+      throw error
+    }
   }
 }
 
@@ -187,17 +188,20 @@ const refreshToken = async (requestRefresh: TokenRefreshRequest): Promise<Token>
     }
 
     throw new Error('requestRefresh must either return a string or an object with an accessToken')
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Failed to refresh token
-    const status = error?.response?.status
-    if (status === 401 || status === 422) {
-      // The refresh token is invalid so remove the stored tokens
-      localStorage.removeItem(STORAGE_KEY)
-      throw new Error(`Got ${status} on token refresh; clearing both auth tokens`)
+    if (axios.isAxiosError(error)) {
+      const status = error?.response?.status
+      if (status === 401 || status === 422) {
+        // The refresh token is invalid so remove the stored tokens
+        localStorage.removeItem(STORAGE_KEY)
+        throw new Error(`Got ${status} on token refresh; clearing both auth tokens`)
+      } else {
+        // A different error, probably network error
+        throw new Error(`Failed to refresh auth token: ${error.message}`)
+      }
     } else {
-      // A different error, probably network error
-      throw new Error(`Failed to refresh auth token: ${error.message}`)
+      throw error
     }
   } finally {
     isRefreshing = false
@@ -246,10 +250,11 @@ export const authTokenInterceptor =
     try {
       accessToken = await refreshTokenIfNeeded(requestRefresh)
       resolveQueue(accessToken)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      declineQueue(error)
-      throw new Error(`Unable to refresh access token for request due to token refresh error: ${error.message}`)
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        declineQueue(error)
+        throw new Error(`Unable to refresh access token for request due to token refresh error: ${error.message}`)
+      }
     }
 
     // add token to headers
