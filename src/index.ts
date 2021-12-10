@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
+import { AxiosInstance, AxiosRequestConfig } from 'axios'
 import jwtDecode from 'jwt-decode'
 
 // a little time before expiration to try refresh (seconds)
@@ -188,20 +188,17 @@ const refreshToken = async (requestRefresh: TokenRefreshRequest): Promise<Token>
     }
 
     throw new Error('requestRefresh must either return a string or an object with an accessToken')
-  } catch (error: unknown) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
     // Failed to refresh token
-    if (axios.isAxiosError(error)) {
-      const status = error?.response?.status
-      if (status === 401 || status === 422) {
-        // The refresh token is invalid so remove the stored tokens
-        localStorage.removeItem(STORAGE_KEY)
-        throw new Error(`Got ${status} on token refresh; clearing both auth tokens`)
-      } else {
-        // A different error, probably network error
-        throw new Error(`Failed to refresh auth token: ${error.message}`)
-      }
+    const status = error?.response?.status
+    if (status === 401 || status === 422) {
+      // The refresh token is invalid so remove the stored tokens
+      localStorage.removeItem(STORAGE_KEY)
+      throw new Error(`Got ${status} on token refresh; clearing both auth tokens`)
     } else {
-      throw error
+      // A different error, probably network error
+      throw new Error(`Failed to refresh auth token: ${error.message}`)
     }
   } finally {
     isRefreshing = false
