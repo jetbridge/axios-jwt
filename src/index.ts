@@ -1,5 +1,5 @@
-import * as jwt from 'jsonwebtoken'
 import { AxiosInstance, AxiosRequestConfig } from 'axios'
+import jwtDecode from 'jwt-decode'
 
 // a little time before expiration to try refresh (seconds)
 const EXPIRE_FUDGE = 10
@@ -118,9 +118,11 @@ const getAuthTokens = (): IAuthTokens | undefined => {
   try {
     // parse stored tokens JSON
     return JSON.parse(rawTokens)
-  } catch (error) {
-    error.message = `Failed to parse auth tokens: ${rawTokens}`
-    throw error
+  } catch (error: unknown) {
+    if (error instanceof SyntaxError) {
+      error.message = `Failed to parse auth tokens: ${rawTokens}`
+      throw error
+    }
   }
 }
 
@@ -143,7 +145,7 @@ const isTokenExpired = (token: Token): boolean => {
  * @returns {string} Unix timestamp
  */
 const getTimestampFromToken = (token: Token): number | undefined => {
-  const decoded = jwt.decode(token) as { [key: string]: number }
+  const decoded = jwtDecode<{ [key: string]: number }>(token)
 
   return decoded?.exp
 }
@@ -186,7 +188,8 @@ const refreshToken = async (requestRefresh: TokenRefreshRequest): Promise<Token>
     }
 
     throw new Error('requestRefresh must either return a string or an object with an accessToken')
-  } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
     // Failed to refresh token
     const status = error?.response?.status
     if (status === 401 || status === 422) {
@@ -233,7 +236,9 @@ export const authTokenInterceptor = ({
       queue.push({ resolve, reject })
     })
       .then((token) => {
-        requestConfig.headers[header] = `${headerPrefix}${token}`
+        if (requestConfig.headers) {
+          requestConfig.headers[header] = `${headerPrefix}${token}`
+        }
         return requestConfig
       })
       .catch(Promise.reject)
@@ -244,13 +249,15 @@ export const authTokenInterceptor = ({
   try {
     accessToken = await refreshTokenIfNeeded(requestRefresh)
     resolveQueue(accessToken)
-  } catch (error) {
-    declineQueue(error)
-    throw new Error(`Unable to refresh access token for request due to token refresh error: ${error.message}`)
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      declineQueue(error)
+      throw new Error(`Unable to refresh access token for request due to token refresh error: ${error.message}`)
+    }
   }
 
   // add token to headers
-  if (accessToken) requestConfig.headers[header] = `${headerPrefix}${accessToken}`
+  if (accessToken && requestConfig.headers) requestConfig.headers[header] = `${headerPrefix}${accessToken}`
   return requestConfig
 }
 
