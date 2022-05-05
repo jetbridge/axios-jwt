@@ -3,13 +3,14 @@ import jwtDecode from 'jwt-decode'
 
 // a little time before expiration to try refresh (seconds)
 const EXPIRE_FUDGE = 10
-export const STORAGE_KEY = `auth-tokens-${process.env.NODE_ENV}`
+export const STORAGE_KEY = `auth-token-${process.env.NODE_ENV}`
 
 type Token = string
 export interface IAuthTokens {
   accessToken: Token
   refreshToken: Token
 }
+let accessToken: Token | null = null
 
 // EXPORTS
 
@@ -26,8 +27,10 @@ export const isLoggedIn = (): boolean => {
  * Sets the access and refresh tokens
  * @param {IAuthTokens} tokens - Access and Refresh tokens
  */
-export const setAuthTokens = (tokens: IAuthTokens): void => localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens))
-
+export const setAuthTokens = (tokens: IAuthTokens): void => {
+  accessToken = tokens.accessToken
+  localStorage.setItem(STORAGE_KEY, tokens.refreshToken)
+}
 /**
  * Sets the access token
  * @param {string} token - Access token
@@ -38,15 +41,16 @@ export const setAccessToken = (token: Token): void => {
     throw new Error('Unable to update access token since there are not tokens currently stored')
   }
 
-  tokens.accessToken = token
-  setAuthTokens(tokens)
+  accessToken = token
 }
 
 /**
  * Clears both tokens
  */
-export const clearAuthTokens = (): void => localStorage.removeItem(STORAGE_KEY)
-
+export const clearAuthTokens = (): void => {
+  accessToken = null
+  localStorage.removeItem(STORAGE_KEY)
+}
 /**
  * Returns the stored refresh token
  * @returns {string} Refresh token
@@ -60,10 +64,7 @@ export const getRefreshToken = (): Token | undefined => {
  * Returns the stored access token
  * @returns {string} Access token
  */
-export const getAccessToken = (): Token | undefined => {
-  const tokens = getAuthTokens()
-  return tokens ? tokens.accessToken : undefined
-}
+export const getAccessToken = (): Token | undefined => (accessToken ? accessToken : undefined)
 
 /**
  * @callback requestRefresh
@@ -77,9 +78,6 @@ export const getAccessToken = (): Token | undefined => {
  * @returns {string} Access token
  */
 export const refreshTokenIfNeeded = async (requestRefresh: TokenRefreshRequest): Promise<Token | undefined> => {
-  // use access token (if we have it)
-  let accessToken = getAccessToken()
-
   // check if access token is expired
   if (!accessToken || isTokenExpired(accessToken)) {
     // do refresh
@@ -112,18 +110,10 @@ export const useAuthTokenInterceptor = applyAuthTokenInterceptor
  * @returns {IAuthTokens} Object containing refresh and access tokens
  */
 const getAuthTokens = (): IAuthTokens | undefined => {
-  const rawTokens = localStorage.getItem(STORAGE_KEY)
-  if (!rawTokens) return
+  const refreshToken = localStorage.getItem(STORAGE_KEY)
+  if (!refreshToken || !accessToken) return
 
-  try {
-    // parse stored tokens JSON
-    return JSON.parse(rawTokens)
-  } catch (error: unknown) {
-    if (error instanceof SyntaxError) {
-      error.message = `Failed to parse auth tokens: ${rawTokens}`
-      throw error
-    }
-  }
+  return { accessToken: accessToken, refreshToken: refreshToken }
 }
 
 /**
@@ -195,6 +185,7 @@ const refreshToken = async (requestRefresh: TokenRefreshRequest): Promise<Token>
     if (status === 401 || status === 422) {
       // The refresh token is invalid so remove the stored tokens
       localStorage.removeItem(STORAGE_KEY)
+      accessToken = null
       throw new Error(`Got ${status} on token refresh; clearing both auth tokens`)
     } else {
       // A different error, probably network error
