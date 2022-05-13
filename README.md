@@ -7,7 +7,7 @@ Store, clear, transmit and automatically refresh JWT authentication tokens. This
 Applies a request interceptor to your axios instance.
 
 The interceptor automatically adds an access token header (default: `Authorization`) to all requests.
-It stores `accessToken` and `refreshToken` in `localStorage` and reads them when needed.
+It stores `accessToken` and `refreshToken` in `localStorage` (web) or 'AsyncStorage' (React Native) and reads them when needed.
 
 It parses the expiration time of your access token and checks to see if it is expired before every request. If it has expired, a request to
 refresh and store a new access token is automatically performed before the request proceeds.
