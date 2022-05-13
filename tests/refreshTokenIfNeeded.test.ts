@@ -1,5 +1,24 @@
 import { STORAGE_KEY, refreshTokenIfNeeded } from '../src'
 import jwt from 'jsonwebtoken'
+import { AxiosError } from 'axios'
+
+function makeAxiosErrorWithStatusCode(statusCode) {
+  const error = new AxiosError(
+    'Server error',
+    'ECONNABORTED',
+    {},
+    {},
+    {
+      status: statusCode,
+      data: {},
+      config: {},
+      headers: {},
+      statusText: '',
+    }
+  )
+
+  return error
+}
 
 describe('refreshTokenIfNeeded', () => {
   it('throws an error if the requestRefresh function threw one', async () => {
@@ -51,10 +70,7 @@ describe('refreshTokenIfNeeded', () => {
 
     // and I have a requestRefresh function that throws an error
     const requestRefresh = async () => {
-      const error: any = new Error('Server error')
-      error.response = {
-        status: 401,
-      }
+      const error = makeAxiosErrorWithStatusCode(401)
 
       throw error
     }
@@ -90,10 +106,7 @@ describe('refreshTokenIfNeeded', () => {
 
     // and I have a requestRefresh function that throws an error
     const requestRefresh = async () => {
-      const error: any = new Error('Server error')
-      error.response = {
-        status: 422,
-      }
+      const error = makeAxiosErrorWithStatusCode(422)
 
       throw error
     }
