@@ -1,6 +1,6 @@
 {
   "name": "axios-jwt",
-  "version": "1.7.2",
+  "version": "1.7.6",
   "description": "Axios interceptor to store, use, and refresh tokens for authentication.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -27,7 +27,7 @@
   },
   "peerDependencies": {
     "@react-native-async-storage/async-storage": "^1.13.2",
-    "axios": "^0.21.1"
+    "axios": "^0.27.0"
   },
   "dependencies": {
     "jwt-decode": "^3.1.2"
