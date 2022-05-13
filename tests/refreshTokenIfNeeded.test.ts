@@ -2,7 +2,7 @@ import { STORAGE_KEY, refreshTokenIfNeeded } from '../src'
 import jwt from 'jsonwebtoken'
 import { AxiosError } from 'axios'
 
-function makeAxiosErrorWithStatusCode(statusCode) {
+function makeAxiosErrorWithStatusCode(statusCode: number) {
   const error = new AxiosError(
     'Server error',
     'ECONNABORTED',
