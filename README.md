@@ -98,7 +98,7 @@ const login = async (params: ILoginRequest) => {
   })
 }
 
-// 5. Clear the auth tokens from localstorage
+// 5. Remove the auth tokens from storage
 const logout = () => clearAuthTokens()
 
 // Check if refresh token exists
