@@ -27,7 +27,8 @@ export const isLoggedIn = (): boolean => {
  * Sets the access and refresh tokens
  * @param {IAuthTokens} tokens - Access and Refresh tokens
  */
-export const setAuthTokens = (tokens: IAuthTokens): void => Storage.setItem(STORAGE_KEY, JSON.stringify(tokens))
+export const setAuthTokens = (tokens: IAuthTokens): void =>
+  Storage.setItem(STORAGE_KEY, JSON.stringify(tokens))
 
 /**
  * Sets the access token
@@ -77,7 +78,9 @@ export const getAccessToken = (): Token | undefined => {
  * @param {requestRefresh} requestRefresh - Function that is used to get a new access token
  * @returns {string} Access token
  */
-export const refreshTokenIfNeeded = async (requestRefresh: TokenRefreshRequest): Promise<Token | undefined> => {
+export const refreshTokenIfNeeded = async (
+  requestRefresh: TokenRefreshRequest
+): Promise<Token | undefined> => {
   // use access token (if we have it)
   let accessToken = getAccessToken()
 
@@ -96,7 +99,10 @@ export const refreshTokenIfNeeded = async (requestRefresh: TokenRefreshRequest):
  * @param {Axios} axios - Axios instance to apply the interceptor to
  * @param {IAuthTokenInterceptorConfig} config - Configuration for the interceptor
  */
-export const applyAuthTokenInterceptor = (axios: AxiosInstance, config: IAuthTokenInterceptorConfig): void => {
+export const applyAuthTokenInterceptor = (
+  axios: AxiosInstance,
+  config: IAuthTokenInterceptorConfig
+): void => {
   if (!axios.interceptors) throw new Error(`invalid axios instance: ${axios}`)
   axios.interceptors.request.use(authTokenInterceptor(config))
 }
@@ -229,7 +235,11 @@ export interface IAuthTokenInterceptorConfig {
  * @returns {Promise} Promise that resolves in the supplied requestConfig
  */
 export const authTokenInterceptor =
-  ({ header = 'Authorization', headerPrefix = 'Bearer ', requestRefresh }: IAuthTokenInterceptorConfig) =>
+  ({
+    header = 'Authorization',
+    headerPrefix = 'Bearer ',
+    requestRefresh,
+  }: IAuthTokenInterceptorConfig) =>
   async (requestConfig: AxiosRequestConfig): Promise<AxiosRequestConfig> => {
     // We need refresh token to do any authenticated requests
     if (!getRefreshToken()) return requestConfig
@@ -256,12 +266,17 @@ export const authTokenInterceptor =
     } catch (error: unknown) {
       if (error instanceof Error) {
         declineQueue(error)
-        throw new Error(`Unable to refresh access token for request due to token refresh error: ${error.message}`)
+        throw new Error(
+          `Unable to refresh access token for request due to token refresh error: ${error.message}`
+        )
       }
     }
 
     // add token to headers
-    if (accessToken && requestConfig.headers) requestConfig.headers[header] = `${headerPrefix}${accessToken}`
+    if (accessToken && requestConfig.headers) {
+      requestConfig.headers[header] = `${headerPrefix}${accessToken}`
+    }
+
     return requestConfig
   }
 
