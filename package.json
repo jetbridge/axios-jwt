@@ -12,6 +12,7 @@
   "author": "JetBridge Inc.",
   "license": "WTFPL",
   "devDependencies": {
+    "@react-native-async-storage/async-storage": "^1.17.10",
     "@types/axios": "0.14.0",
     "@types/jest": "29.2.2",
     "@types/jsonwebtoken": "8.5.9",
