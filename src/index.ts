@@ -1,8 +1,8 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
-import jwtDecode, { JwtPayload } from 'jwt-decode';
-import getStorage from './storage';
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
+import jwtDecode, { JwtPayload } from 'jwt-decode'
+import getStorage from './storage'
 
-const Storage = getStorage();
+const Storage = getStorage()
 
 // a little time before expiration to try refresh (seconds)
 const EXPIRE_FUDGE = 10
@@ -242,45 +242,45 @@ export const authTokenInterceptor =
     headerPrefix = 'Bearer ',
     requestRefresh,
   }: IAuthTokenInterceptorConfig) =>
-    async (requestConfig: AxiosRequestConfig): Promise<AxiosRequestConfig> => {
-      // We need refresh token to do any authenticated requests
-      if (!getRefreshToken()) return requestConfig
+  async (requestConfig: AxiosRequestConfig): Promise<AxiosRequestConfig> => {
+    // We need refresh token to do any authenticated requests
+    if (!getRefreshToken()) return requestConfig
 
-      // Queue the request if another refresh request is currently happening
-      if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          queue.push({ resolve, reject })
+    // Queue the request if another refresh request is currently happening
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        queue.push({ resolve, reject })
+      })
+        .then((token) => {
+          if (requestConfig.headers) {
+            requestConfig.headers[header] = `${headerPrefix}${token}`
+          }
+          return requestConfig
         })
-          .then((token) => {
-            if (requestConfig.headers) {
-              requestConfig.headers[header] = `${headerPrefix}${token}`
-            }
-            return requestConfig
-          })
-          .catch(Promise.reject)
-      }
-
-      // Do refresh if needed
-      let accessToken
-      try {
-        accessToken = await refreshTokenIfNeeded(requestRefresh)
-        resolveQueue(accessToken)
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          declineQueue(error)
-          throw new Error(
-            `Unable to refresh access token for request due to token refresh error: ${error.message}`
-          )
-        }
-      }
-
-      // add token to headers
-      if (accessToken && requestConfig.headers) {
-        requestConfig.headers[header] = `${headerPrefix}${accessToken}`
-      }
-
-      return requestConfig
+        .catch(Promise.reject)
     }
+
+    // Do refresh if needed
+    let accessToken
+    try {
+      accessToken = await refreshTokenIfNeeded(requestRefresh)
+      resolveQueue(accessToken)
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        declineQueue(error)
+        throw new Error(
+          `Unable to refresh access token for request due to token refresh error: ${error.message}`
+        )
+      }
+    }
+
+    // add token to headers
+    if (accessToken && requestConfig.headers) {
+      requestConfig.headers[header] = `${headerPrefix}${accessToken}`
+    }
+
+    return requestConfig
+  }
 
 type RequestsQueue = {
   resolve: (value?: unknown) => void

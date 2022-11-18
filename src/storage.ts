@@ -1,2 +1,2 @@
-const getStorage = () => localStorage;
+const getStorage = () => localStorage
 export default getStorage
