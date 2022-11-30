@@ -1,5 +1,7 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
-import jwtDecode, { JwtPayload } from 'jwt-decode'
+import axios from 'axios'
+import type { AxiosInstance, AxiosRequestConfig } from 'axios'
+import jwtDecode from 'jwt-decode'
+import type { JwtPayload } from 'jwt-decode'
 import Storage from './storage'
 
 // a little time before expiration to try refresh (seconds)
