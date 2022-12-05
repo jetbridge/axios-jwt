@@ -2,7 +2,8 @@ import axios from 'axios'
 import type { AxiosInstance, AxiosRequestConfig } from 'axios'
 import jwtDecode from 'jwt-decode'
 import type { JwtPayload } from 'jwt-decode'
-import Storage from './storage'
+import { StorageProxy, StorageServiceType } from './StorageProxy'
+import './storage'
 
 // a little time before expiration to try refresh (seconds)
 const EXPIRE_FUDGE = 10
@@ -30,7 +31,7 @@ export const isLoggedIn = (): boolean => {
  * @param {IAuthTokens} tokens - Access and Refresh tokens
  */
 export const setAuthTokens = (tokens: IAuthTokens): void =>
-  Storage.setItem(STORAGE_KEY, JSON.stringify(tokens))
+  StorageProxy.Storage?.set(STORAGE_KEY, JSON.stringify(tokens))
 
 /**
  * Sets the access token
@@ -49,7 +50,7 @@ export const setAccessToken = (token: Token): void => {
 /**
  * Clears both tokens
  */
-export const clearAuthTokens = (): void => Storage.removeItem(STORAGE_KEY)
+export const clearAuthTokens = (): void => StorageProxy.Storage?.remove(STORAGE_KEY)
 
 /**
  * Returns the stored refresh token
@@ -106,7 +107,12 @@ export const applyAuthTokenInterceptor = (
   config: IAuthTokenInterceptorConfig
 ): void => {
   if (!axios.interceptors) throw new Error(`invalid axios instance: ${axios}`)
+
   axios.interceptors.request.use(authTokenInterceptor(config))
+}
+
+export const applyStorage = (storage: StorageServiceType) => {
+  StorageProxy.Storage = storage
 }
 
 /**
@@ -121,7 +127,7 @@ export const useAuthTokenInterceptor = applyAuthTokenInterceptor
  * @returns {IAuthTokens} Object containing refresh and access tokens
  */
 const getAuthTokens = (): IAuthTokens | undefined => {
-  const rawTokens = Storage.getItem(STORAGE_KEY)
+  const rawTokens = StorageProxy.Storage?.get(STORAGE_KEY)
   if (!rawTokens) return
 
   try {
@@ -203,7 +209,7 @@ const refreshToken = async (requestRefresh: TokenRefreshRequest): Promise<Token>
       const status = error.response?.status
       if (status === 401 || status === 422) {
         // The refresh token is invalid so remove the stored tokens
-        Storage.removeItem(STORAGE_KEY)
+        StorageProxy.Storage?.remove(STORAGE_KEY)
         throw new Error(`Got ${status} on token refresh; clearing both auth tokens`)
       }
     }
