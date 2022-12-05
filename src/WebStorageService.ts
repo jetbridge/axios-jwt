@@ -1,4 +1,4 @@
-export class StorageService {
+export class WebStorageService {
   private _storage: Storage
 
   constructor(storage: Storage) {

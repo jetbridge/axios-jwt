@@ -50,7 +50,7 @@ npx pod-install # installs the native iOS packages
 ```typescript
 // api.ts
 
-import { IAuthTokens, TokenRefreshRequest, applyAuthTokenInterceptor, StorageService } from 'axios-jwt'
+import { IAuthTokens, TokenRefreshRequest, applyAuthTokenInterceptor, WebStorageService } from 'axios-jwt'
 import axios from 'axios'
 
 const BASE_URL = 'https://api.example.com'
@@ -80,7 +80,7 @@ applyAuthTokenInterceptor(axiosInstance, { requestRefresh })
 
 // 4. Optional: initialize storage localStorage/sessionStorage/nativeStorage
 applyStorage(
-  new StorageService(window.localStorage)
+  new WebStorageService(window.localStorage)
 )
 ```
 

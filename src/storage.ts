@@ -1,5 +1,5 @@
 import { StorageProxy } from './StorageProxy';
-import { StorageService } from './StorageService';
+import { WebStorageService } from './WebStorageService';
 
 // Initialize default web-storage
-StorageProxy.Storage = new StorageService(localStorage)
+StorageProxy.Storage = new WebStorageService(localStorage)

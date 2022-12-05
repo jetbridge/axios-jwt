@@ -1,5 +1,5 @@
 import { STORAGE_KEY, getAccessToken, applyStorage } from '../src';
-import { StorageService } from '../src/StorageService';
+import { WebStorageService } from '../src/WebStorageService';
 
 describe('getAccessToken', () => {
   beforeEach(function () {
@@ -37,7 +37,7 @@ describe('getAccessToken', () => {
 
   describe('for sessionStorage', function () {
     beforeEach( () => {
-      applyStorage(new StorageService(window.sessionStorage))
+      applyStorage(new WebStorageService(window.sessionStorage))
     })
 
     it('returns undefined if tokens are not set', () => {
