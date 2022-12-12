@@ -1,6 +1,11 @@
-import { STORAGE_KEY, getRefreshToken } from '../src'
+import { applyLocalStorage, getRefreshToken } from '../src';
+import { STORAGE_KEY } from '../src/StorageKey';
 
 describe('getRefreshToken', () => {
+  beforeAll(() => {
+    applyLocalStorage()
+  })
+
   it('returns undefined if tokens are not set', () => {
     // GIVEN
     // localStorage is empty

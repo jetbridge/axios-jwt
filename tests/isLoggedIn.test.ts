@@ -1,6 +1,11 @@
-import { STORAGE_KEY, isLoggedIn } from '../src'
+import { STORAGE_KEY } from '../src/StorageKey';
+import { applyLocalStorage, isLoggedIn } from '../src';
 
 describe('isLoggedIn', () => {
+  beforeAll(() => {
+    applyLocalStorage()
+  })
+
   it('returns false if tokens are not set', () => {
     // GIVEN
     // localStorage is empty

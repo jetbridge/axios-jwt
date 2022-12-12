@@ -50,7 +50,7 @@ npx pod-install # installs the native iOS packages
 ```typescript
 // api.ts
 
-import { IAuthTokens, TokenRefreshRequest, applyAuthTokenInterceptor, WebStorageService, applyStorage } from 'axios-jwt'
+import { IAuthTokens, TokenRefreshRequest, applyAuthTokenInterceptor, applyLocalStorage } from 'axios-jwt'
 import axios from 'axios'
 
 const BASE_URL = 'https://api.example.com'
@@ -78,10 +78,8 @@ const requestRefresh: TokenRefreshRequest = async (refreshToken: string): Promis
 // 3. Add interceptor to your axios instance
 applyAuthTokenInterceptor(axiosInstance, { requestRefresh })
 
-// 4. Optional: initialize storage localStorage/sessionStorage/nativeStorage
-applyStorage(
-  new WebStorageService(window.localStorage)
-)
+// 4. Migration to 2.2.0+: initialize storage: localStorage/sessionStorage/nativeStorage. Helpers: applyLocalStorage, applySessionStorage, or use applyStorage to inject yours
+applyLocalStorage()
 ```
 
 ### Login/logout

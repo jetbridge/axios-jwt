@@ -1,8 +1,4 @@
-export type StorageServiceType = {
-  remove(key: string): void
-  set(key: string, value: string): void
-  get(value: string): string | null
-}
+import { StorageServiceType } from './StorageServiceType';
 
 type StorageProxyType = {
   Storage: StorageServiceType | null

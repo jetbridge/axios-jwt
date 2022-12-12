@@ -14,6 +14,6 @@ export class WebStorageService {
   }
 
   set(key: string, value: string) {
-    return this._storage.setItem(key, value)
+    this._storage.setItem(key, value)
   }
 }

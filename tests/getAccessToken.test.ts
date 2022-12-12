@@ -1,39 +1,48 @@
-import { STORAGE_KEY, getAccessToken, applyStorage } from '../src';
+import { applyLocalStorage, getAccessToken } from '../src';
 import { WebStorageService } from '../src/WebStorageService';
+import { STORAGE_KEY } from '../src/StorageKey';
+import { applyStorage } from '../src';
 
 describe('getAccessToken', () => {
   beforeEach(function () {
     window.localStorage.clear()
+    window.sessionStorage.clear()
   })
 
-  it('returns undefined if tokens are not set', () => {
-    // GIVEN
-    // localStorage is empty
-    localStorage.removeItem(STORAGE_KEY)
+  describe('for localStorage', function () {
+    beforeAll(() => {
+      applyLocalStorage()
+    })
 
-    // WHEN
-    // I call getAccessToken
-    const result = getAccessToken()
+    it('returns undefined if tokens are not set', () => {
+      // GIVEN
+      // localStorage is empty
+      localStorage.removeItem(STORAGE_KEY)
 
-    // THEN
-    // I expect the result to be undefined
-    expect(result).toEqual(undefined)
-  })
+      // WHEN
+      // I call getAccessToken
+      const result = getAccessToken()
 
-  it('returns the access token is it is set', () => {
-    // GIVEN
-    // Both tokens are stored in localstorage
-    const tokens = { accessToken: 'accesstoken', refreshToken: 'refreshtoken' }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens))
+      // THEN
+      // I expect the result to be undefined
+      expect(result).toEqual(undefined)
+    })
 
-    // WHEN
-    // I call getAccessToken
-    const result = getAccessToken()
+    it('returns the access token is it is set', () => {
+      // GIVEN
+      // Both tokens are stored in localstorage
+      const tokens = { accessToken: 'accesstoken', refreshToken: 'refreshtoken' }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens))
 
-    // THEN
-    // I expect the result to be the supplied access token
-    expect(result).toEqual('accesstoken')
-  })
+      // WHEN
+      // I call getAccessToken
+      const result = getAccessToken()
+
+      // THEN
+      // I expect the result to be the supplied access token
+      expect(result).toEqual('accesstoken')
+    })
+  });
 
   describe('for sessionStorage', function () {
     beforeEach( () => {
