@@ -1,5 +1,5 @@
-import { AxiosRequestConfig } from 'axios'
-import jwt from 'jsonwebtoken'
+import { AxiosRequestConfig } from 'axios';
+import jwt from 'jsonwebtoken';
 import { applyLocalStorage, authTokenInterceptor } from '../src';
 
 describe('authTokenInterceptor', () => {
