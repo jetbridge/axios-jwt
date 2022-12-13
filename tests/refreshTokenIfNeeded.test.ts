@@ -1,4 +1,4 @@
-import { applyLocalStorage, refreshTokenIfNeeded } from '../src';
+import { refreshTokenIfNeeded } from '../src';
 import jwt from 'jsonwebtoken';
 import { AxiosError } from 'axios'
 import { STORAGE_KEY } from '../src/StorageKey';
@@ -22,10 +22,6 @@ function makeAxiosErrorWithStatusCode(statusCode: number) {
 }
 
 describe('refreshTokenIfNeeded', () => {
-  beforeAll(() => {
-    applyLocalStorage()
-  })
-
   it('throws an error if the requestRefresh function threw one', async () => {
     // GIVEN
     // I have an access token that expired an hour ago

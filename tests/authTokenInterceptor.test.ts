@@ -1,12 +1,8 @@
 import { AxiosRequestConfig } from 'axios';
 import jwt from 'jsonwebtoken';
-import { applyLocalStorage, authTokenInterceptor } from '../src';
+import { authTokenInterceptor } from '../src';
 
 describe('authTokenInterceptor', () => {
-  beforeAll(() => {
-    applyLocalStorage()
-  })
-
   it('returns the original request config if refresh token is not set', async () => {
     // GIVEN
     // I have a config defined

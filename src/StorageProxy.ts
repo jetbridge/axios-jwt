@@ -1,7 +1,7 @@
-import { StorageServiceType } from './StorageServiceType';
+import { StorageType } from './StorageType';
 
 type StorageProxyType = {
-  Storage: StorageServiceType | null
+  Storage: StorageType | null
 }
 
 export const StorageProxy: StorageProxyType = {

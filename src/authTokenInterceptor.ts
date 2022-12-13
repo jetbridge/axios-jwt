@@ -8,6 +8,8 @@ import { TokenRefreshRequest } from './TokenRefreshRequest';
 import { Token } from './Token';
 import jwtDecode, { JwtPayload } from 'jwt-decode';
 import { STORAGE_KEY } from './StorageKey';
+import { getBrowserLocalStorage } from './getBrowserLocalStorage';
+import { applyStorage } from './applyStorage';
 
 // a little time before expiration to try refresh (seconds)
 let expireFudge = 10
@@ -169,9 +171,11 @@ export const authTokenInterceptor =
      header = 'Authorization',
      headerPrefix = 'Bearer ',
      requestRefresh,
-      tokenExpireFudge = 10,
+     tokenExpireFudge = 10,
+     getStorage = getBrowserLocalStorage
    }: IAuthTokenInterceptorConfig) => {
     expireFudge = tokenExpireFudge
+    applyStorage(getStorage())
 
     return async (requestConfig: AxiosRequestConfig): Promise<AxiosRequestConfig> => {
       // We need refresh token to do any authenticated requests

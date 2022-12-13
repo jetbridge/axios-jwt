@@ -11,10 +11,9 @@ export * from './tokensUtils';
 export * from './authTokenInterceptor';
 export * from './setAuthTokens';
 export * from './applyAuthTokenInterceptor'
-export * from './applyStorage'
-export * from './applySessionStorage'
-export * from './applyLocalStorage'
+export * from './getBrowserSessionStorage'
+export * from './getBrowserLocalStorage'
 export * from './IAuthTokens'
 export * from './TokenRefreshRequest'
 export * from './setAuthTokens'
-export * from './StorageServiceType'
+export * from './StorageType'

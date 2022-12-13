@@ -1,6 +1,6 @@
 import { StorageProxy } from './StorageProxy';
-import { StorageServiceType } from './StorageServiceType';
+import { StorageType } from './StorageType';
 
-export const applyStorage = (storage: StorageServiceType) => {
+export const applyStorage = (storage: StorageType) => {
   StorageProxy.Storage = storage;
 };

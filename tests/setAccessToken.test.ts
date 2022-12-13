@@ -1,11 +1,7 @@
-import { applyLocalStorage, setAccessToken } from '../src';
+import { setAccessToken } from '../src';
 import { STORAGE_KEY } from '../src/StorageKey';
 
 describe('setAccessToken', () => {
-  beforeAll(() => {
-    applyLocalStorage()
-  })
-
   it('throws an error if there are no tokens stored', () => {
     // GIVEN
     // localStorage is empty

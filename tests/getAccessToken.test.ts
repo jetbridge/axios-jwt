@@ -1,7 +1,5 @@
-import { applyLocalStorage, getAccessToken } from '../src';
-import { WebStorageService } from '../src/WebStorageService';
+import { getAccessToken, authTokenInterceptor, getBrowserSessionStorage } from '../src';
 import { STORAGE_KEY } from '../src/StorageKey';
-import { applyStorage } from '../src';
 
 describe('getAccessToken', () => {
   beforeEach(function () {
@@ -10,10 +8,6 @@ describe('getAccessToken', () => {
   })
 
   describe('for localStorage', function () {
-    beforeAll(() => {
-      applyLocalStorage()
-    })
-
     it('returns undefined if tokens are not set', () => {
       // GIVEN
       // localStorage is empty
@@ -46,7 +40,10 @@ describe('getAccessToken', () => {
 
   describe('for sessionStorage', function () {
     beforeEach( () => {
-      applyStorage(new WebStorageService(window.sessionStorage))
+      const getStorage = getBrowserSessionStorage
+      const requestRefresh = jest.fn()
+
+      authTokenInterceptor({getStorage, requestRefresh })
     })
 
     it('returns undefined if tokens are not set', () => {

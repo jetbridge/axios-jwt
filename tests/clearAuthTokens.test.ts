@@ -1,12 +1,8 @@
 import { STORAGE_KEY } from '../src/StorageKey';
-import { applyLocalStorage, clearAuthTokens } from '../src';
+import { clearAuthTokens } from '../src';
 
 
 describe('clearAuthTokens', () => {
-  beforeAll(() => {
-    applyLocalStorage()
-  })
-
   it('removes the tokens from localstorage', () => {
     // GIVEN
     // Tokens are stored in localStorage

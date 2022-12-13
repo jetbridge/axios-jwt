@@ -1,11 +1,7 @@
-import { applyLocalStorage, setAuthTokens } from '../src';
+import { setAuthTokens } from '../src';
 import { STORAGE_KEY } from '../src/StorageKey';
 
 describe('setAuthTokens', () => {
-  beforeAll(() => {
-    applyLocalStorage()
-  })
-
   it('stores the tokens in localstorage', () => {
     // GIVEN
     // localStorage is empty
