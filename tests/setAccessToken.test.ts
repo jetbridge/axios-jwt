@@ -1,4 +1,5 @@
-import { STORAGE_KEY, setAccessToken } from '../src'
+import { setAccessToken } from '../src';
+import { STORAGE_KEY } from '../src/StorageKey';
 
 describe('setAccessToken', () => {
   it('throws an error if there are no tokens stored', () => {

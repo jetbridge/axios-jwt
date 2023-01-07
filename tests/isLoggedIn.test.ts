@@ -1,4 +1,5 @@
-import { STORAGE_KEY, isLoggedIn } from '../src'
+import { STORAGE_KEY } from '../src/StorageKey';
+import { isLoggedIn } from '../src';
 
 describe('isLoggedIn', () => {
   it('returns false if tokens are not set', () => {

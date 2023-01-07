@@ -1,4 +1,5 @@
-import { STORAGE_KEY, setAuthTokens } from '../src'
+import { setAuthTokens } from '../src';
+import { STORAGE_KEY } from '../src/StorageKey';
 
 describe('setAuthTokens', () => {
   it('stores the tokens in localstorage', () => {

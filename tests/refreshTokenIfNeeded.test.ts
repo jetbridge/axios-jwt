@@ -1,6 +1,7 @@
-import { STORAGE_KEY, refreshTokenIfNeeded } from '../src'
-import jwt from 'jsonwebtoken'
+import { refreshTokenIfNeeded } from '../src';
+import jwt from 'jsonwebtoken';
 import { AxiosError } from 'axios'
+import { STORAGE_KEY } from '../src/StorageKey';
 
 function makeAxiosErrorWithStatusCode(statusCode: number) {
   const error = new AxiosError(

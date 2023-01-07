@@ -1,4 +1,5 @@
-import { STORAGE_KEY, getRefreshToken } from '../src'
+import { getRefreshToken } from '../src';
+import { STORAGE_KEY } from '../src/StorageKey';
 
 describe('getRefreshToken', () => {
   it('returns undefined if tokens are not set', () => {

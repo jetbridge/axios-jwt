@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { applyAuthTokenInterceptor } from '../src'
+import { useAuthTokenInterceptor } from '../src';
 
-describe('applyAuthTokenInterceptor', () => {
+describe('useAuthTokenInterceptor', () => {
   it('throws an error if the passed axios instance if not an actual axios instance', () => {
     // GIVEN
     // I have an object that is not an Axios instance
@@ -12,7 +12,7 @@ describe('applyAuthTokenInterceptor', () => {
     // THEN
     // I expect an error to have been called
     expect(() => {
-      applyAuthTokenInterceptor(totallyNotAnAxiosInstance as any, { requestRefresh: jest.fn() })
+      useAuthTokenInterceptor(totallyNotAnAxiosInstance as any, { requestRefresh: jest.fn() })
     }).toThrow('invalid axios instance: [object Object]')
   })
 
@@ -26,7 +26,7 @@ describe('applyAuthTokenInterceptor', () => {
 
     // WHEN
     // I call applyAuthTokenInterceptor
-    applyAuthTokenInterceptor(instance, { requestRefresh: jest.fn() })
+    useAuthTokenInterceptor(instance, { requestRefresh: jest.fn() })
 
     // THEN
     // I expect an interceptor to have been added

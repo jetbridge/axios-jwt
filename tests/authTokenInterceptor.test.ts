@@ -1,7 +1,6 @@
-import { AxiosRequestConfig } from 'axios'
-import jwt from 'jsonwebtoken'
-
-import { authTokenInterceptor } from '../src'
+import { AxiosRequestConfig } from 'axios';
+import jwt from 'jsonwebtoken';
+import { authTokenInterceptor } from '../src';
 
 describe('authTokenInterceptor', () => {
   it('returns the original request config if refresh token is not set', async () => {

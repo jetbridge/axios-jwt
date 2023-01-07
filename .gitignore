@@ -64,3 +64,6 @@ typings/
 dist
 
 yarn.lock
+
+# IDE
+.idea

@@ -1,4 +1,6 @@
-import { STORAGE_KEY, clearAuthTokens } from '../src'
+import { STORAGE_KEY } from '../src/StorageKey';
+import { clearAuthTokens } from '../src';
+
 
 describe('clearAuthTokens', () => {
   it('removes the tokens from localstorage', () => {

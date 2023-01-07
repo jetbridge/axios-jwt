@@ -50,7 +50,7 @@ npx pod-install # installs the native iOS packages
 ```typescript
 // api.ts
 
-import { IAuthTokens, TokenRefreshRequest, applyAuthTokenInterceptor } from 'axios-jwt'
+import { IAuthTokens, TokenRefreshRequest, applyAuthTokenInterceptor, getBrowserLocalStorage } from 'axios-jwt'
 import axios from 'axios'
 
 const BASE_URL = 'https://api.example.com'
@@ -77,6 +77,12 @@ const requestRefresh: TokenRefreshRequest = async (refreshToken: string): Promis
 
 // 3. Add interceptor to your axios instance
 applyAuthTokenInterceptor(axiosInstance, { requestRefresh })
+
+// New to 2.2.0+: initialize with storage: localStorage/sessionStorage/nativeStorage. Helpers: getBrowserLocalStorage, getBrowserSessionStorage
+const getStorage = getBrowserLocalStorage
+
+// You can create you own storage, it has to comply with type StorageType
+applyAuthTokenInterceptor(axiosInstance, { requestRefresh, getStorage })
 ```
 
 ### Login/logout
