@@ -1,15 +1,15 @@
-import type { AxiosRequestConfig } from 'axios';
-import { getAccessToken, getRefreshToken, setAccessToken } from './tokensUtils';
-import { setAuthTokens } from './setAuthTokens';
-import axios from 'axios';
-import { StorageProxy } from './StorageProxy';
-import { IAuthTokenInterceptorConfig } from './IAuthTokenInterceptorConfig';
-import { TokenRefreshRequest } from './TokenRefreshRequest';
-import { Token } from './Token';
-import jwtDecode, { JwtPayload } from 'jwt-decode';
-import { STORAGE_KEY } from './StorageKey';
-import { getBrowserLocalStorage } from './getBrowserLocalStorage';
-import { applyStorage } from './applyStorage';
+import type { AxiosRequestConfig } from 'axios'
+import { getAccessToken, getRefreshToken, setAccessToken } from './tokensUtils'
+import { setAuthTokens } from './setAuthTokens'
+import axios from 'axios'
+import { StorageProxy } from './StorageProxy'
+import { IAuthTokenInterceptorConfig } from './IAuthTokenInterceptorConfig'
+import { TokenRefreshRequest } from './TokenRefreshRequest'
+import { Token } from './Token'
+import jwtDecode, { JwtPayload } from 'jwt-decode'
+import { STORAGE_KEY } from './StorageKey'
+import { getBrowserLocalStorage } from './getBrowserLocalStorage'
+import { applyStorage } from './applyStorage'
 
 // a little time before expiration to try refresh (seconds)
 let expireFudge = 10
@@ -166,54 +166,53 @@ export const refreshTokenIfNeeded = async (
  * @param {IAuthTokenInterceptorConfig} config - Configuration for the interceptor
  * @returns {Promise} Promise that resolves in the supplied requestConfig
  */
-export const authTokenInterceptor =
-  ({
-     header = 'Authorization',
-     headerPrefix = 'Bearer ',
-     requestRefresh,
-     tokenExpireFudge = 10,
-     getStorage = getBrowserLocalStorage
-   }: IAuthTokenInterceptorConfig) => {
-    expireFudge = tokenExpireFudge
-    applyStorage(getStorage())
+export const authTokenInterceptor = ({
+  header = 'Authorization',
+  headerPrefix = 'Bearer ',
+  requestRefresh,
+  tokenExpireFudge = 10,
+  getStorage = getBrowserLocalStorage,
+}: IAuthTokenInterceptorConfig) => {
+  expireFudge = tokenExpireFudge
+  applyStorage(getStorage())
 
-    return async (requestConfig: AxiosRequestConfig): Promise<AxiosRequestConfig> => {
-      // We need refresh token to do any authenticated requests
-      if (!getRefreshToken()) return requestConfig;
+  return async (requestConfig: AxiosRequestConfig): Promise<AxiosRequestConfig> => {
+    // We need refresh token to do any authenticated requests
+    if (!getRefreshToken()) return requestConfig
 
-      // Queue the request if another refresh request is currently happening
-      if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          queue.push({ resolve, reject });
-        })
+    // Queue the request if another refresh request is currently happening
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        queue.push({ resolve, reject })
+      })
         .then((token) => {
           if (requestConfig.headers) {
-            requestConfig.headers[header] = `${headerPrefix}${token}`;
+            requestConfig.headers[header] = `${headerPrefix}${token}`
           }
-          return requestConfig;
+          return requestConfig
         })
-        .catch(Promise.reject);
-      }
+        .catch(Promise.reject)
+    }
 
-      // Do refresh if needed
-      let accessToken;
-      try {
-        accessToken = await refreshTokenIfNeeded(requestRefresh);
-        resolveQueue(accessToken);
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          declineQueue(error);
-          throw new Error(
-            `Unable to refresh access token for request due to token refresh error: ${error.message}`,
-          );
-        }
+    // Do refresh if needed
+    let accessToken
+    try {
+      accessToken = await refreshTokenIfNeeded(requestRefresh)
+      resolveQueue(accessToken)
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        declineQueue(error)
+        throw new Error(
+          `Unable to refresh access token for request due to token refresh error: ${error.message}`
+        )
       }
+    }
 
-      // add token to headers
-      if (accessToken && requestConfig.headers) {
-        requestConfig.headers[header] = `${headerPrefix}${accessToken}`;
-      }
+    // add token to headers
+    if (accessToken && requestConfig.headers) {
+      requestConfig.headers[header] = `${headerPrefix}${accessToken}`
+    }
 
-      return requestConfig;
-    };
+    return requestConfig
   }
+}

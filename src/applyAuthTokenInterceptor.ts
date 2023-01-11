@@ -1,6 +1,6 @@
-import { AxiosInstance } from 'axios';
-import { IAuthTokenInterceptorConfig } from './IAuthTokenInterceptorConfig';
-import { authTokenInterceptor } from './authTokenInterceptor';
+import { AxiosInstance } from 'axios'
+import { IAuthTokenInterceptorConfig } from './IAuthTokenInterceptorConfig'
+import { authTokenInterceptor } from './authTokenInterceptor'
 
 /**
  *
@@ -9,9 +9,9 @@ import { authTokenInterceptor } from './authTokenInterceptor';
  */
 export const applyAuthTokenInterceptor = (
   axios: AxiosInstance,
-  config: IAuthTokenInterceptorConfig,
+  config: IAuthTokenInterceptorConfig
 ): void => {
-  if (!axios.interceptors) throw new Error(`invalid axios instance: ${axios}`);
+  if (!axios.interceptors) throw new Error(`invalid axios instance: ${axios}`)
 
-  axios.interceptors.request.use(authTokenInterceptor(config));
-};
+  axios.interceptors.request.use(authTokenInterceptor(config))
+}

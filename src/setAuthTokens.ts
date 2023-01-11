@@ -1,6 +1,6 @@
-import { StorageProxy } from './StorageProxy';
-import { STORAGE_KEY } from './StorageKey';
-import { IAuthTokens } from './IAuthTokens';
+import { StorageProxy } from './StorageProxy'
+import { STORAGE_KEY } from './StorageKey'
+import { IAuthTokens } from './IAuthTokens'
 
 /**
  * Sets the access and refresh tokens
