@@ -1,4 +1,4 @@
-import { refreshTokenIfNeeded } from '../src';
+import { refreshTokenIfNeeded } from '../index';
 import jwt from 'jsonwebtoken';
 import { AxiosError } from 'axios'
 import { STORAGE_KEY } from '../src/StorageKey';

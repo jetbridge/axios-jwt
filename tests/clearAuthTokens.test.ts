@@ -1,5 +1,5 @@
 import { STORAGE_KEY } from '../src/StorageKey';
-import { clearAuthTokens } from '../src';
+import { clearAuthTokens } from '../index';
 
 
 describe('clearAuthTokens', () => {

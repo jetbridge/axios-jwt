@@ -1,6 +1,6 @@
-import { Token } from './Token';
+import { Token } from './Token'
 
 export interface IAuthTokens {
-  accessToken: Token;
-  refreshToken: Token;
+  accessToken: Token
+  refreshToken: Token
 }

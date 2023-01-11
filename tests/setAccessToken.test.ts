@@ -1,4 +1,4 @@
-import { setAccessToken } from '../src';
+import { setAccessToken } from '../index';
 import { STORAGE_KEY } from '../src/StorageKey';
 
 describe('setAccessToken', () => {

@@ -1,5 +1,5 @@
 import { applyStorage } from './src/applyStorage';
-import { getBrowserLocalStorage } from './src';
+import { getBrowserLocalStorage } from './index';
 
 beforeAll(()=> {
   applyStorage(getBrowserLocalStorage())

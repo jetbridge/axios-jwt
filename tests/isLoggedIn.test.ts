@@ -1,5 +1,5 @@
 import { STORAGE_KEY } from '../src/StorageKey';
-import { isLoggedIn } from '../src';
+import { isLoggedIn } from '../index';
 
 describe('isLoggedIn', () => {
   it('returns false if tokens are not set', () => {

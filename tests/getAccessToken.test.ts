@@ -1,4 +1,4 @@
-import { getAccessToken, authTokenInterceptor, getBrowserSessionStorage } from '../src';
+import { getAccessToken, authTokenInterceptor, getBrowserSessionStorage } from '../index';
 import { STORAGE_KEY } from '../src/StorageKey';
 
 describe('getAccessToken', () => {
