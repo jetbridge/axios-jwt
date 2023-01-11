@@ -1,4 +1,4 @@
-import { applyAuthTokenInterceptor } from './src/applyAuthTokenInterceptor';
+import { applyAuthTokenInterceptor } from './src/applyAuthTokenInterceptor'
 
 // EXPORTS
 
@@ -7,9 +7,9 @@ import { applyAuthTokenInterceptor } from './src/applyAuthTokenInterceptor';
  */
 export const useAuthTokenInterceptor = applyAuthTokenInterceptor
 
-export * from './src/tokensUtils';
-export * from './src/authTokenInterceptor';
-export * from './src/setAuthTokens';
+export * from './src/tokensUtils'
+export * from './src/authTokenInterceptor'
+export * from './src/setAuthTokens'
 export * from './src/applyAuthTokenInterceptor'
 export * from './src/getBrowserSessionStorage'
 export * from './src/getBrowserLocalStorage'
