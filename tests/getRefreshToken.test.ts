@@ -1,4 +1,4 @@
-import { getRefreshToken } from '../src';
+import { getRefreshToken } from '../index';
 import { STORAGE_KEY } from '../src/StorageKey';
 
 describe('getRefreshToken', () => {

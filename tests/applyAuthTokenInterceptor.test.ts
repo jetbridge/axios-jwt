@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { applyAuthTokenInterceptor } from '../src'
+import { applyAuthTokenInterceptor } from '../index'
 
 describe('applyAuthTokenInterceptor', () => {
   it('throws an error if the passed axios instance if not an actual axios instance', () => {
