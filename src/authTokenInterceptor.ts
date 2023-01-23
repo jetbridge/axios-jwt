@@ -10,8 +10,10 @@ import jwtDecode, { JwtPayload } from 'jwt-decode'
 import { STORAGE_KEY } from './StorageKey'
 import { getBrowserLocalStorage } from './getBrowserLocalStorage'
 import { applyStorage } from './applyStorage'
+import ms from 'ms'
 
-// a little time before expiration to try refresh (seconds)
+// Token Leeway
+// A little time before expiration to try refresh (seconds)
 let expireFudge = 10
 
 type RequestsQueue = {
@@ -170,10 +172,11 @@ export const authTokenInterceptor = ({
   header = 'Authorization',
   headerPrefix = 'Bearer ',
   requestRefresh,
-  tokenExpireFudge = 10,
+  tokenExpireFudge = '10s',
   getStorage = getBrowserLocalStorage,
 }: IAuthTokenInterceptorConfig) => {
-  expireFudge = tokenExpireFudge
+  expireFudge =
+    ms(typeof tokenExpireFudge === 'string' ? tokenExpireFudge : `${tokenExpireFudge}s`) / 1000
   applyStorage(getStorage())
 
   return async (requestConfig: AxiosRequestConfig): Promise<AxiosRequestConfig> => {
