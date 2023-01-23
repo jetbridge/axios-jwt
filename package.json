@@ -37,7 +37,8 @@
     }
   },
   "dependencies": {
-    "jwt-decode": "3.1.2"
+    "jwt-decode": "3.1.2",
+    "ms": "^3.0.0-canary.1"
   },
   "scripts": {
     "build": "tsc",
