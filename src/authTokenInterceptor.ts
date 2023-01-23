@@ -10,7 +10,7 @@ import jwtDecode, { JwtPayload } from 'jwt-decode'
 import { STORAGE_KEY } from './StorageKey'
 import { getBrowserLocalStorage } from './getBrowserLocalStorage'
 import { applyStorage } from './applyStorage'
-import ms, { StringValue } from 'ms'
+import ms from 'ms'
 
 // Token Leeway
 // A little time before expiration to try refresh (seconds)
