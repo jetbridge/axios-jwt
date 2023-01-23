@@ -175,7 +175,8 @@ export const authTokenInterceptor = ({
   tokenExpireFudge = '10s',
   getStorage = getBrowserLocalStorage,
 }: IAuthTokenInterceptorConfig) => {
-  expireFudge = ms(typeof tokenExpireFudge === 'string' ? tokenExpireFudge : `${tokenExpireFudge}s`)
+  expireFudge =
+    ms(typeof tokenExpireFudge === 'string' ? tokenExpireFudge : `${tokenExpireFudge}s`) / 1000
   applyStorage(getStorage())
 
   return async (requestConfig: AxiosRequestConfig): Promise<AxiosRequestConfig> => {
