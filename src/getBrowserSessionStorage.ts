@@ -1,3 +1,7 @@
 import { BrowserStorageService } from './BrowserStorageService'
 
-export const getBrowserSessionStorage = () => new BrowserStorageService(window.sessionStorage)
+export const getBrowserSessionStorage = () => {
+    if (typeof window !== 'undefined') {
+        return new BrowserStorageService(window.sessionStorage)
+    }
+}

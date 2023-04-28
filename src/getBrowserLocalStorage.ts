@@ -1,3 +1,7 @@
 import { BrowserStorageService } from './BrowserStorageService'
 
-export const getBrowserLocalStorage = () => new BrowserStorageService(window.localStorage)
+export const getBrowserLocalStorage = () => {
+  if (typeof window !== 'undefined') {
+    return new BrowserStorageService(window.localStorage)
+  }
+}

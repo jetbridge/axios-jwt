@@ -1,16 +1,15 @@
-import type { AxiosRequestConfig } from 'axios'
-import { getAccessToken, getRefreshToken, setAccessToken } from './tokensUtils'
-import { setAuthTokens } from './setAuthTokens'
 import axios from 'axios'
-import { StorageProxy } from './StorageProxy'
-import { IAuthTokenInterceptorConfig } from './IAuthTokenInterceptorConfig'
-import { TokenRefreshRequest } from './TokenRefreshRequest'
-import { Token } from './Token'
 import jwtDecode, { JwtPayload } from 'jwt-decode'
-import { STORAGE_KEY } from './StorageKey'
-import { getBrowserLocalStorage } from './getBrowserLocalStorage'
-import { applyStorage } from './applyStorage'
 import ms from 'ms'
+import { IAuthTokenInterceptorConfig } from './IAuthTokenInterceptorConfig'
+import { STORAGE_KEY } from './StorageKey'
+import { StorageProxy } from './StorageProxy'
+import { Token } from './Token'
+import { TokenRefreshRequest } from './TokenRefreshRequest'
+import { applyStorage } from './applyStorage'
+import { getBrowserLocalStorage } from './getBrowserLocalStorage'
+import { setAuthTokens } from './setAuthTokens'
+import { getAccessToken, getRefreshToken, setAccessToken } from './tokensUtils'
 
 // Token Leeway
 // A little time before expiration to try refresh (seconds)
@@ -179,7 +178,8 @@ export const authTokenInterceptor = ({
     ms(typeof tokenExpireFudge === 'string' ? tokenExpireFudge : `${tokenExpireFudge}s`) / 1000
   applyStorage(getStorage())
 
-  return async (requestConfig: AxiosRequestConfig): Promise<AxiosRequestConfig> => {
+  return async (requestConfig: any): Promise<any> => {
+    // Waiting for a fix in axios types
     // We need refresh token to do any authenticated requests
     if (!getRefreshToken()) return requestConfig
 
