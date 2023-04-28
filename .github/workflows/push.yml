@@ -13,7 +13,7 @@ jobs:
 
       - name: 'Install Dependencies'
         id: install
-        run: npm install && npm install @react-native-async-storage/async-storage@1.15.17 axios@0.27.0
+        run: npm install && npm install @react-native-async-storage/async-storage@1.15.17 axios@1.4.0
 
       - name: Run prettier
         run: ./node_modules/.bin/prettier -c ./src
@@ -31,7 +31,7 @@ jobs:
 
       - name: 'Install Dependencies'
         id: install
-        run: npm install && npm install @react-native-async-storage/async-storage@1.15.17 axios@0.27.0
+        run: npm install && npm install @react-native-async-storage/async-storage@1.15.17 axios@1.4.0
 
       - name: 'Build Project'
         id: build
@@ -47,8 +47,7 @@ jobs:
 
       - name: 'Install Dependencies'
         id: install
-        run: npm install && npm install @react-native-async-storage/async-storage axios@0.27.0
+        run: npm install && npm install @react-native-async-storage/async-storage axios@1.4.0
 
       - name: Run rests
         run: npm run test
-

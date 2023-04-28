@@ -1,6 +1,7 @@
-import { AxiosError, AxiosHeaders } from 'axios'
-import jwt from 'jsonwebtoken'
 import { refreshTokenIfNeeded } from '../index'
+import jwt from 'jsonwebtoken'
+import { AxiosError } from 'axios'
+import type { AxiosHeaders } from 'axios'
 import { STORAGE_KEY } from '../src/StorageKey'
 
 function makeAxiosErrorWithStatusCode(statusCode: number) {
