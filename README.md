@@ -122,8 +122,8 @@ const refreshToken = getRefreshToken()
 ```typescript
 applyAuthTokenInterceptor(axiosInstance, {
   requestRefresh,  // async function that takes a refreshToken and returns a promise the resolves in a fresh accessToken
-  header = "Authorization",  // header name
-  headerPrefix = "Bearer ",  // header value prefix
+  header: "Authorization",  // header name
+  headerPrefix: "Bearer ",  // header value prefix
 })
 ```
 
