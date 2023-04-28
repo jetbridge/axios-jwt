@@ -178,6 +178,7 @@ export const authTokenInterceptor = ({
     ms(typeof tokenExpireFudge === 'string' ? tokenExpireFudge : `${tokenExpireFudge}s`) / 1000
   applyStorage(getStorage())
 
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any -- Waiting for a fix in axios types
   return async (requestConfig: any): Promise<any> => {
     // Waiting for a fix in axios types
     // We need refresh token to do any authenticated requests
