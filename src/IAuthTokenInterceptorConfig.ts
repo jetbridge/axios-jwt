@@ -1,6 +1,6 @@
-import { TokenRefreshRequest } from './TokenRefreshRequest'
-import { StorageType } from './StorageType'
 import { StringValue } from 'ms'
+import { StorageType } from './StorageType'
+import { TokenRefreshRequest } from './TokenRefreshRequest'
 
 export interface IAuthTokenInterceptorConfig {
   header?: string
@@ -11,5 +11,5 @@ export interface IAuthTokenInterceptorConfig {
    *  Token leeway in seconds (or via [`ms`](https://github.com/vercel/ms))
    */
   tokenExpireFudge?: number | StringValue
-  getStorage?: () => StorageType
+  getStorage?: () => StorageType | undefined
 }

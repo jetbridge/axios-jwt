@@ -1,18 +1,23 @@
-import { refreshTokenIfNeeded } from '../index';
-import jwt from 'jsonwebtoken';
+import { refreshTokenIfNeeded } from '../index'
+import jwt from 'jsonwebtoken'
 import { AxiosError } from 'axios'
-import { STORAGE_KEY } from '../src/StorageKey';
+import type { AxiosHeaders } from 'axios'
+import { STORAGE_KEY } from '../src/StorageKey'
 
 function makeAxiosErrorWithStatusCode(statusCode: number) {
   const error = new AxiosError(
     'Server error',
     'ECONNABORTED',
-    {},
+    {
+      headers: {} as AxiosHeaders,
+    },
     {},
     {
       status: statusCode,
       data: {},
-      config: {},
+      config: {
+        headers: {} as AxiosHeaders,
+      },
       headers: {},
       statusText: '',
     }
@@ -51,7 +56,9 @@ describe('refreshTokenIfNeeded', () => {
 
     // THEN
     // I expect the error handler to have been called with the right error
-    expect(catchFn).toHaveBeenLastCalledWith(new Error('Failed to refresh auth token: Server error'))
+    expect(catchFn).toHaveBeenLastCalledWith(
+      new Error('Failed to refresh auth token: Server error')
+    )
   })
 
   it('throws an error and clears the storage if the requestRefresh function throws an error with a 401 status code', async () => {
@@ -85,7 +92,9 @@ describe('refreshTokenIfNeeded', () => {
 
     // THEN
     // I expect the error handler to have been called with the right error
-    expect(catchFn).toHaveBeenLastCalledWith(new Error('Got 401 on token refresh; clearing both auth tokens'))
+    expect(catchFn).toHaveBeenLastCalledWith(
+      new Error('Got 401 on token refresh; clearing both auth tokens')
+    )
     // and the storage to have been cleared
     expect(localStorage.getItem(STORAGE_KEY)).toBeNull()
   })
@@ -121,7 +130,9 @@ describe('refreshTokenIfNeeded', () => {
 
     // THEN
     // I expect the error handler to have been called with the right error
-    expect(catchFn).toHaveBeenLastCalledWith(new Error('Got 422 on token refresh; clearing both auth tokens'))
+    expect(catchFn).toHaveBeenLastCalledWith(
+      new Error('Got 422 on token refresh; clearing both auth tokens')
+    )
     // and the storage to have been cleared
     expect(localStorage.getItem(STORAGE_KEY)).toBeNull()
   })
@@ -150,7 +161,10 @@ describe('refreshTokenIfNeeded', () => {
     // THEN
     // I expect the stored access token to have been updated
     const storedTokens = localStorage.getItem(STORAGE_KEY) as string
-    expect(JSON.parse(storedTokens)).toEqual({ accessToken: 'newaccesstoken', refreshToken: 'refreshtoken' })
+    expect(JSON.parse(storedTokens)).toEqual({
+      accessToken: 'newaccesstoken',
+      refreshToken: 'refreshtoken',
+    })
 
     // and the result to be the new access token
     expect(result).toEqual('newaccesstoken')
@@ -181,7 +195,10 @@ describe('refreshTokenIfNeeded', () => {
     // THEN
     // I expect the stored access token to have been updated
     const storedTokens = localStorage.getItem(STORAGE_KEY) as string
-    expect(JSON.parse(storedTokens)).toEqual({ accessToken: 'newaccesstoken', refreshToken: 'refreshtoken' })
+    expect(JSON.parse(storedTokens)).toEqual({
+      accessToken: 'newaccesstoken',
+      refreshToken: 'refreshtoken',
+    })
 
     // and the result to be the new access token
     expect(result).toEqual('newaccesstoken')
@@ -203,7 +220,10 @@ describe('refreshTokenIfNeeded', () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens))
 
     // and I have a requestRefresh function that returns both tokens
-    const requestRefresh = async () => ({ accessToken: 'newaccesstoken', refreshToken: 'newrefreshtoken' })
+    const requestRefresh = async () => ({
+      accessToken: 'newaccesstoken',
+      refreshToken: 'newrefreshtoken',
+    })
 
     // WHEN
     // I call refreshTokenIfNeeded
@@ -212,7 +232,10 @@ describe('refreshTokenIfNeeded', () => {
     // THEN
     // I expect both the stord tokens to have been updated
     const storedTokens = localStorage.getItem(STORAGE_KEY) as string
-    expect(JSON.parse(storedTokens)).toEqual({ accessToken: 'newaccesstoken', refreshToken: 'newrefreshtoken' })
+    expect(JSON.parse(storedTokens)).toEqual({
+      accessToken: 'newaccesstoken',
+      refreshToken: 'newrefreshtoken',
+    })
 
     // and the result to be the new access token
     expect(result).toEqual('newaccesstoken')
@@ -234,7 +257,10 @@ describe('refreshTokenIfNeeded', () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens))
 
     // and I have a requestRefresh function that returns an access token
-    const requestRefresh = async () => ({ access_token: 'wrongkey!', refresh_token: 'anotherwrongkey!' })
+    const requestRefresh = async () => ({
+      access_token: 'wrongkey!',
+      refresh_token: 'anotherwrongkey!',
+    })
 
     // and I have an error handler
     const errorHandler = jest.fn()

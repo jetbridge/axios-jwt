@@ -1,4 +1,3 @@
-import type { AxiosRequestConfig } from 'axios'
 import { getAccessToken, getRefreshToken, setAccessToken } from './tokensUtils'
 import { setAuthTokens } from './setAuthTokens'
 import axios from 'axios'
@@ -179,7 +178,9 @@ export const authTokenInterceptor = ({
     ms(typeof tokenExpireFudge === 'string' ? tokenExpireFudge : `${tokenExpireFudge}s`) / 1000
   applyStorage(getStorage())
 
-  return async (requestConfig: AxiosRequestConfig): Promise<AxiosRequestConfig> => {
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any -- Waiting for a fix in axios types
+  return async (requestConfig: any): Promise<any> => {
+    // Waiting for a fix in axios types
     // We need refresh token to do any authenticated requests
     if (!getRefreshToken()) return requestConfig
 
