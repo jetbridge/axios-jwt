@@ -1,5 +1,5 @@
-import { getAccessToken, authTokenInterceptor, getBrowserSessionStorage } from '../index';
-import { STORAGE_KEY } from '../src/StorageKey';
+import { getAccessToken, authTokenInterceptor, getBrowserSessionStorage } from '../index'
+import { STORAGE_KEY } from '../src/StorageKey'
 
 describe('getAccessToken', () => {
   beforeEach(function () {
@@ -8,21 +8,21 @@ describe('getAccessToken', () => {
   })
 
   describe('for localStorage', function () {
-    it('returns undefined if tokens are not set', () => {
+    it('returns undefined if tokens are not set', async () => {
       // GIVEN
       // localStorage is empty
       localStorage.removeItem(STORAGE_KEY)
 
       // WHEN
       // I call getAccessToken
-      const result = getAccessToken()
+      const result = await getAccessToken()
 
       // THEN
       // I expect the result to be undefined
       expect(result).toEqual(undefined)
     })
 
-    it('returns the access token is it is set', () => {
+    it('returns the access token is it is set', async () => {
       // GIVEN
       // Both tokens are stored in localstorage
       const tokens = { accessToken: 'accesstoken', refreshToken: 'refreshtoken' }
@@ -30,37 +30,37 @@ describe('getAccessToken', () => {
 
       // WHEN
       // I call getAccessToken
-      const result = getAccessToken()
+      const result = await getAccessToken()
 
       // THEN
       // I expect the result to be the supplied access token
       expect(result).toEqual('accesstoken')
     })
-  });
+  })
 
   describe('for sessionStorage', function () {
-    beforeEach( () => {
+    beforeEach(() => {
       const getStorage = getBrowserSessionStorage
       const requestRefresh = jest.fn()
 
-      authTokenInterceptor({getStorage, requestRefresh })
+      authTokenInterceptor({ getStorage, requestRefresh })
     })
 
-    it('returns undefined if tokens are not set', () => {
+    it('returns undefined if tokens are not set', async () => {
       // GIVEN
       // localStorage is empty
       sessionStorage.removeItem(STORAGE_KEY)
 
       // WHEN
       // I call getAccessToken
-      const result = getAccessToken()
+      const result = await getAccessToken()
 
       // THEN
       // I expect the result to be undefined
       expect(result).toEqual(undefined)
     })
 
-    it('returns the access token is it is set', () => {
+    it('returns the access token is it is set', async () => {
       // GIVEN
       // Both tokens are stored in localstorage
       const tokens = { accessToken: 'accesstoken_session', refreshToken: 'refreshtoken_session' }
@@ -68,7 +68,7 @@ describe('getAccessToken', () => {
 
       // WHEN
       // I call getAccessToken
-      const result = getAccessToken()
+      const result = await getAccessToken()
 
       // THEN
       // I expect the result to be the supplied access token

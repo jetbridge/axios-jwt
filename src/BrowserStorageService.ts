@@ -5,15 +5,15 @@ export class BrowserStorageService {
     this._storage = storage
   }
 
-  remove(key: string) {
+  async remove(key: string) {
     this._storage.removeItem(key)
   }
 
-  get(key: string) {
+  async get(key: string) {
     return this._storage.getItem(key)
   }
 
-  set(key: string, value: string) {
+  async set(key: string, value: string) {
     this._storage.setItem(key, value)
   }
 }

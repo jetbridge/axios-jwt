@@ -1,6 +1,6 @@
 {
   "name": "axios-jwt",
-  "version": "3.0.2",
+  "version": "4.0.0",
   "description": "Axios interceptor to store, use, and refresh tokens for authentication.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

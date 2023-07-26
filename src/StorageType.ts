@@ -1,5 +1,5 @@
 export type StorageType = {
-  remove(key: string): void
-  set(key: string, value: string): void
-  get(value: string): string | null
+  remove(key: string): Promise<void>
+  set(key: string, value: string): Promise<void>
+  get(value: string): Promise<string | null>
 }

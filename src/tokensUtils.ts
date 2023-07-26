@@ -10,8 +10,8 @@ import { IAuthTokens } from './IAuthTokens'
  *  Returns the refresh and access tokens
  * @returns {IAuthTokens} Object containing refresh and access tokens
  */
-const getAuthTokens = (): IAuthTokens | undefined => {
-  const rawTokens = StorageProxy.Storage?.get(STORAGE_KEY)
+const getAuthTokens = async (): Promise<IAuthTokens | undefined> => {
+  const rawTokens = await StorageProxy.Storage?.get(STORAGE_KEY)
   if (!rawTokens) return
 
   try {
@@ -29,22 +29,22 @@ const getAuthTokens = (): IAuthTokens | undefined => {
  * Sets the access token
  * @param {string} token - Access token
  */
-export const setAccessToken = (token: Token): void => {
-  const tokens = getAuthTokens()
+export const setAccessToken = async (token: Token): Promise<void> => {
+  const tokens = await getAuthTokens()
   if (!tokens) {
     throw new Error('Unable to update access token since there are not tokens currently stored')
   }
 
   tokens.accessToken = token
-  setAuthTokens(tokens)
+  await setAuthTokens(tokens)
 }
 
 /**
  * Returns the stored refresh token
  * @returns {string} Refresh token
  */
-export const getRefreshToken = (): Token | undefined => {
-  const tokens = getAuthTokens()
+export const getRefreshToken = async (): Promise<Token | undefined> => {
+  const tokens = await getAuthTokens()
   return tokens ? tokens.refreshToken : undefined
 }
 
@@ -52,21 +52,22 @@ export const getRefreshToken = (): Token | undefined => {
  * Returns the stored access token
  * @returns {string} Access token
  */
-export const getAccessToken = (): Token | undefined => {
-  const tokens = getAuthTokens()
+export const getAccessToken = async (): Promise<Token | undefined> => {
+  const tokens = await getAuthTokens()
   return tokens ? tokens.accessToken : undefined
 }
 
 /**
  * Clears both tokens
  */
-export const clearAuthTokens = (): void => StorageProxy.Storage?.remove(STORAGE_KEY)
+export const clearAuthTokens = async (): Promise<void> =>
+  await StorageProxy.Storage?.remove(STORAGE_KEY)
 
 /**
  * Checks if refresh tokens are stored
  * @returns Whether the user is logged in or not
  */
-export const isLoggedIn = (): boolean => {
-  const token = getRefreshToken()
+export const isLoggedIn = async (): Promise<boolean> => {
+  const token = await getRefreshToken()
   return !!token
 }
