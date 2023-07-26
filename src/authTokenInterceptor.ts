@@ -15,37 +15,7 @@ import ms from 'ms'
 // A little time before expiration to try refresh (seconds)
 let expireFudge = 10
 
-type RequestsQueue = {
-  resolve: (value?: unknown) => void
-  reject: (reason?: unknown) => void
-}[]
-
-let isRefreshing = false
-let queue: RequestsQueue = []
-
-/**
- * Function that resolves all items in the queue with the provided token
- * @param token New access token
- */
-const resolveQueue = (token?: Token) => {
-  queue.forEach((p) => {
-    p.resolve(token)
-  })
-
-  queue = []
-}
-
-/**
- * Function that declines all items in the queue with the provided error
- * @param error Error
- */
-const declineQueue = (error: Error) => {
-  queue.forEach((p) => {
-    p.reject(error)
-  })
-
-  queue = []
-}
+let currentlyRequestingPromise: Promise<Token | undefined> | undefined = undefined
 
 /**
  * Gets the unix timestamp from an access token
@@ -87,17 +57,16 @@ const isTokenExpired = (token: Token): boolean => {
 
 /**
  * Refreshes the access token using the provided function
+ * Note: NOT to be called externally.  Only accessible through an interceptor
  *
  * @param {requestRefresh} requestRefresh - Function that is used to get a new access token
  * @returns {string} - Fresh access token
  */
 const refreshToken = async (requestRefresh: TokenRefreshRequest): Promise<Token> => {
-  const refreshToken = getRefreshToken()
+  const refreshToken = await getRefreshToken()
   if (!refreshToken) throw new Error('No refresh token available')
 
   try {
-    isRefreshing = true
-
     // Refresh and store access token using the supplied refresh function
     const newTokens = await requestRefresh(refreshToken)
     if (typeof newTokens === 'object' && newTokens?.accessToken) {
@@ -115,7 +84,7 @@ const refreshToken = async (requestRefresh: TokenRefreshRequest): Promise<Token>
       const status = error.response?.status
       if (status === 401 || status === 422) {
         // The refresh token is invalid so remove the stored tokens
-        StorageProxy.Storage?.remove(STORAGE_KEY)
+        await StorageProxy.Storage?.remove(STORAGE_KEY)
         throw new Error(`Got ${status} on token refresh; clearing both auth tokens`)
       }
     }
@@ -126,8 +95,6 @@ const refreshToken = async (requestRefresh: TokenRefreshRequest): Promise<Token>
     } else {
       throw new Error('Failed to refresh auth token and failed to parse error')
     }
-  } finally {
-    isRefreshing = false
   }
 }
 
@@ -146,12 +113,11 @@ export const refreshTokenIfNeeded = async (
   requestRefresh: TokenRefreshRequest
 ): Promise<Token | undefined> => {
   // use access token (if we have it)
-  let accessToken = getAccessToken()
+  let accessToken = await getAccessToken()
 
   // check if access token is expired
   if (!accessToken || isTokenExpired(accessToken)) {
     // do refresh
-
     accessToken = await refreshToken(requestRefresh)
   }
 
@@ -182,33 +148,30 @@ export const authTokenInterceptor = ({
   return async (requestConfig: any): Promise<any> => {
     // Waiting for a fix in axios types
     // We need refresh token to do any authenticated requests
-    if (!getRefreshToken()) return requestConfig
+    if (!(await getRefreshToken())) return requestConfig
 
-    // Queue the request if another refresh request is currently happening
-    if (isRefreshing) {
-      return new Promise((resolve, reject) => {
-        queue.push({ resolve, reject })
-      })
-        .then((token) => {
-          if (requestConfig.headers) {
-            requestConfig.headers[header] = `${headerPrefix}${token}`
-          }
-          return requestConfig
-        })
-        .catch(Promise.reject)
-    }
+    let accessToken = undefined
 
-    // Do refresh if needed
-    let accessToken
-    try {
-      accessToken = await refreshTokenIfNeeded(requestRefresh)
-      resolveQueue(accessToken)
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        declineQueue(error)
-        throw new Error(
-          `Unable to refresh access token for request due to token refresh error: ${error.message}`
-        )
+    // Try to await a current request
+    if (currentlyRequestingPromise) accessToken = await currentlyRequestingPromise
+
+    if (!accessToken) {
+      try {
+        // Sets the promise so everyone else will wait - then get the value
+        currentlyRequestingPromise = refreshTokenIfNeeded(requestRefresh)
+        accessToken = await currentlyRequestingPromise
+
+        // Reset the promise
+        currentlyRequestingPromise = undefined
+      } catch (error: unknown) {
+        // Reset the promise
+        currentlyRequestingPromise = undefined
+
+        if (error instanceof Error) {
+          throw new Error(
+            `Unable to refresh access token for request due to token refresh error: ${error.message}`
+          )
+        }
       }
     }
 

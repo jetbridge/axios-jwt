@@ -1,5 +1,5 @@
-import { setAccessToken } from '../index';
-import { STORAGE_KEY } from '../src/StorageKey';
+import { setAccessToken } from '../index'
+import { STORAGE_KEY } from '../src/StorageKey'
 
 describe('setAccessToken', () => {
   it('throws an error if there are no tokens stored', () => {
@@ -11,9 +11,9 @@ describe('setAccessToken', () => {
     // I call setAccessToken
     // THEN
     // I expect an error to have been thrown
-    expect(() => {
-      setAccessToken('accesstoken')
-    }).toThrow('Unable to update access token since there are not tokens currently stored')
+    expect(async () => {
+      await setAccessToken('accesstoken')
+    }).rejects.toThrow('Unable to update access token since there are not tokens currently stored')
   })
 
   it('throws an error if the stored tokens cannot be parsed', () => {
@@ -25,12 +25,12 @@ describe('setAccessToken', () => {
     // I call setAuthTokens
     // THEN
     // I expect an error to be thrown
-    expect(() => {
-      setAccessToken('accesstoken')
-    }).toThrow('Failed to parse auth tokens: totallynotjson')
+    expect(async () => {
+      await setAccessToken('accesstoken')
+    }).rejects.toThrow('Failed to parse auth tokens: totallynotjson')
   })
 
-  it('stores the tokens in localstorage', () => {
+  it('stores the tokens in localstorage', async () => {
     // GIVEN
     // localStorage is empty
     const tokens = { accessToken: 'accesstoken', refreshToken: 'refreshtoken' }
@@ -38,11 +38,14 @@ describe('setAccessToken', () => {
 
     // WHEN
     // I call setAccessToken
-    setAccessToken('newaccesstoken')
+    await setAccessToken('newaccesstoken')
 
     // THEN
     // I expect the stored access token to have been updated
     const storedTokens = localStorage.getItem(STORAGE_KEY) as string
-    expect(JSON.parse(storedTokens)).toEqual({ accessToken: 'newaccesstoken', refreshToken: 'refreshtoken' })
+    expect(JSON.parse(storedTokens)).toEqual({
+      accessToken: 'newaccesstoken',
+      refreshToken: 'refreshtoken',
+    })
   })
 })
