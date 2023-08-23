@@ -8,7 +8,7 @@ import { IAuthTokens } from './IAuthTokens'
 
 /**
  *  Returns the refresh and access tokens
- * @returns {IAuthTokens} Object containing refresh and access tokens
+ *  @returns Object containing refresh and access tokens
  */
 const getAuthTokens = async (): Promise<IAuthTokens | undefined> => {
   const rawTokens = await StorageProxy.Storage?.get(STORAGE_KEY)
@@ -27,12 +27,12 @@ const getAuthTokens = async (): Promise<IAuthTokens | undefined> => {
 
 /**
  * Sets the access token
- * @param {string} token - Access token
+ * @param {Token} token - Access token
  */
 export const setAccessToken = async (token: Token): Promise<void> => {
   const tokens = await getAuthTokens()
   if (!tokens) {
-    throw new Error('Unable to update access token since there are not tokens currently stored')
+    throw new Error('Unable to update access token since there are no tokens currently stored')
   }
 
   tokens.accessToken = token
@@ -41,7 +41,7 @@ export const setAccessToken = async (token: Token): Promise<void> => {
 
 /**
  * Returns the stored refresh token
- * @returns {string} Refresh token
+ * @returns Refresh token
  */
 export const getRefreshToken = async (): Promise<Token | undefined> => {
   const tokens = await getAuthTokens()
@@ -50,7 +50,7 @@ export const getRefreshToken = async (): Promise<Token | undefined> => {
 
 /**
  * Returns the stored access token
- * @returns {string} Access token
+ * @returns Access token
  */
 export const getAccessToken = async (): Promise<Token | undefined> => {
   const tokens = await getAuthTokens()

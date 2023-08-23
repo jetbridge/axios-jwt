@@ -20,8 +20,8 @@ let currentlyRequestingPromise: Promise<Token | undefined> | undefined = undefin
 /**
  * Gets the unix timestamp from an access token
  *
- * @param {string} token - Access token
- * @returns {string} Unix timestamp
+ * @param {Token} token - Access token
+ * @returns Unix timestamp
  */
 const getTimestampFromToken = (token: Token): number | undefined => {
   const decoded = jwtDecode<JwtPayload>(token)
@@ -106,7 +106,7 @@ const refreshToken = async (requestRefresh: TokenRefreshRequest): Promise<Token>
 
 /**
  * Gets the current access token, exchanges it with a new one if it's expired and then returns the token.
- * @param {requestRefresh} requestRefresh - Function that is used to get a new access token
+ * @param {TokenRefreshRequest} requestRefresh - Function that is used to get a new access token
  * @returns {string} Access token
  */
 export const refreshTokenIfNeeded = async (
