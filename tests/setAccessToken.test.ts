@@ -13,7 +13,7 @@ describe('setAccessToken', () => {
     // I expect an error to have been thrown
     expect(async () => {
       await setAccessToken('accesstoken')
-    }).rejects.toThrow('Unable to update access token since there are not tokens currently stored')
+    }).rejects.toThrow('Unable to update access token since there are no tokens currently stored')
   })
 
   it('throws an error if the stored tokens cannot be parsed', () => {
