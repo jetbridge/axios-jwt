@@ -1,6 +1,6 @@
 {
   "name": "axios-jwt",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "Axios interceptor to store, use, and refresh tokens for authentication.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,7 +10,7 @@
   },
   "homepage": "https://github.com/jetbridge/axios-jwt",
   "author": "JetBridge Inc.",
-  "license": "WTFPL",
+  "license": "MIT",
   "devDependencies": {
     "@react-native-async-storage/async-storage": "^1.18.1",
     "@types/jest": "29.5.1",
