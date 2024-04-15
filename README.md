@@ -134,7 +134,7 @@ applyAuthTokenInterceptor(axiosInstance, {
 ## Non-TypeScript implementation
 
 ```javascript
-import { applyAuthTokenInterceptor } from 'axios-jwt';
+import { applyAuthTokenInterceptor, setAuthTokens, clearAuthTokens } from 'axios-jwt';
 import axios from 'axios';
 
 const BASE_URL = 'https://api.example.com'
