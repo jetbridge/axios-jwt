@@ -105,16 +105,16 @@ const login = async (params: ILoginRequest) => {
 }
 
 // 5. Remove the auth tokens from storage
-const logout = () => clearAuthTokens()
+const logout = async () => await clearAuthTokens()
 
 // Check if refresh token exists
-if (isLoggedIn()) {
+if (await isLoggedIn()) {
   // assume we are logged in because we have a refresh token
 }
 
 // Get access to tokens
-const accessToken = getAccessToken()
-const refreshToken = getRefreshToken()
+const accessToken = await getAccessToken()
+const refreshToken = await getRefreshToken()
 ```
 
 ## Configuration
